@@ -1,0 +1,24 @@
+log4j.rootLogger=info,A1,A2
+
+
+log4j.appender.A1=org.apache.log4j.ConsoleAppender
+#log4j.appender.A1.Threshold=ERROR
+
+log4j.appender.A1.layout=org.apache.log4j.PatternLayout
+log4j.appender.A1.layout.ConversionPattern=%p %c{2} (%M:%L) - %m%n
+
+# Set the level of the logger named "org.apache.log4j.examples" to 
+# Level.INFO, attach appender A2.
+
+
+# Appender A2 writes to the file "test" in user's home.
+log4j.appender.A2=org.apache.log4j.RollingFileAppender
+log4j.appender.A2.File=log.txt
+
+log4j.appender.A2.Append=true
+log4j.appender.A2.MaxBackupIndex=3
+log4j.appender.MaxFileSize=5MB 
+
+# Appender A2 uses the PatternLayout.
+log4j.appender.A2.layout=org.apache.log4j.PatternLayout
+log4j.appender.A2.layout.ConversionPattern=%5r %-5p %c{2} - %m%n

@@ -1,0 +1,84 @@
+<!DOCTYPE html><html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Advanced options</title>
+<link href="../standalone/help_common.css" type="text/css" rel="stylesheet">
+<link href="../standalone/help.css" type="text/css" rel="stylesheet">
+<script type="text/javascript">
+helpId = 'exe4j.wizard.advanced.$folder$';
+indexUrl= '../index.html';
+</script><script src="../standalone/jquery.min.js" type="text/javascript"></script><script src="../standalone/tracking.js" type="text/javascript"></script>
+</head>
+<body>
+<div class="header-container">
+<div class="header-title">
+<h2>Advanced Options</h2>
+</div>
+<div class="header-nav">
+<div class="nav-wrapper">
+<a title="key: j" href="../wizard/finish.html" class="nav-left"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: u" href="../wizard/$folder$.html" class="nav-up"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: d" href="../wizard/redirection.html" class="nav-down"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: k" href="../wizard/dialogs/$folder$.html" class="nav-right"></a>
+</div>
+</div>
+</div>
+<hr>
+<div class="spacer"></div>
+<b>Contents:</b>
+<br>
+<table style="margin-top: 1ex" cellpadding="2" cellspacing="0" border="0">
+<tr>
+<td width="30">&nbsp;</td><td><img border="0" src="../images/help_topic_18.png">&nbsp;&nbsp;</td><td><a href="../wizard/redirection.html">exe4j Wizard - Redirection</a></td>
+</tr>
+<tr>
+<td width="30">&nbsp;</td><td><img border="0" src="../images/help_topic_18.png">&nbsp;&nbsp;</td><td><a href="../wizard/service.html">exe4j Wizard - Service Options</a></td>
+</tr>
+<tr>
+<td width="30">&nbsp;</td><td><img border="0" src="../images/help_topic_18.png">&nbsp;&nbsp;</td><td><a href="../wizard/versionInfo.html">exe4j Wizard - Version Info</a></td>
+</tr>
+<tr>
+<td width="30">&nbsp;</td><td><img border="0" src="../images/help_topic_18.png">&nbsp;&nbsp;</td><td><a href="../wizard/64bit.html">exe4j Wizard - 32-bit or 64-bit</a></td>
+</tr>
+<tr>
+<td width="30">&nbsp;</td><td><img border="0" src="../images/help_topic_18.png">&nbsp;&nbsp;</td><td><a href="../wizard/executionLevel.html">exe4j Wizard - Manifest Options</a></td>
+</tr>
+<tr>
+<td width="30">&nbsp;</td><td><img border="0" src="../images/help_topic_18.png">&nbsp;&nbsp;</td><td><a href="../wizard/native.html">exe4j Wizard - Native library directories</a></td>
+</tr>
+<tr>
+<td width="30">&nbsp;</td><td><img border="0" src="../images/help_topic_18.png">&nbsp;&nbsp;</td><td><a href="../wizard/searchSequence.html">exe4j Wizard - Configure Search Sequence</a></td>
+</tr>
+<tr>
+<td width="30">&nbsp;</td><td><img border="0" src="../images/help_topic_18.png">&nbsp;&nbsp;</td><td><a href="../wizard/vmType.html">exe4j Wizard - Choose Preferred VM</a></td>
+</tr>
+<tr>
+<td width="30">&nbsp;</td><td><img border="0" src="../images/help_topic_18.png">&nbsp;&nbsp;</td><td><a href="../wizard/splashScreenOptions.html">exe4j Wizard - Text Lines On Splash Screen</a></td>
+</tr>
+</table>
+<br>
+<hr>
+<div class="header-container">
+<div class="header-nav">
+<div class="nav-wrapper">
+<a title="key: j" href="../wizard/finish.html" class="nav-left"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: u" href="../wizard/$folder$.html" class="nav-up"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: d" href="../wizard/redirection.html" class="nav-down"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: k" href="../wizard/dialogs/$folder$.html" class="nav-right"></a>
+</div>
+</div>
+</div>
+</body>
+</html>

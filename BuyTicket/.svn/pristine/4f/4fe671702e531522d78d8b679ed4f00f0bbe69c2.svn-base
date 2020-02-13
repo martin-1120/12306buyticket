@@ -1,0 +1,17 @@
+#Sat Sep 19 19:43:48 CST 2015
+debug=false
+userpwd=lyw785490650
+username=785490650@qq.com
+
+useChaojiying=false
+chaojiyingUserName=8294-test123456abc
+chaojiyingPwd=test123
+
+https.proxySet=false
+https.proxyHost=203.110.175.111
+https.proxyPort=8080
+
+
+cbbStartStation.Value=SZQ
+cbbEndStation.Value=GZG
+dateTimePicker.Text=2016-10-01

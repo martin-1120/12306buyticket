@@ -1,0 +1,422 @@
+package com.buyticket.core;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+import net.sf.json.JSONObject;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.http.Consts;
+import org.apache.http.Header;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.params.ClientPNames;
+import org.apache.http.client.params.CookiePolicy;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.params.ConnRouteParams;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.impl.client.AbstractHttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
+
+
+
+@SuppressWarnings("deprecation")
+public class HttpUtil {
+	
+	public static SSLSocketFactory getSSLSocketFactory(){
+		SSLContext ctx=null;
+		try {
+			ctx = SSLContext.getInstance("SSL");
+		} catch (NoSuchAlgorithmException e1) {
+			e1.printStackTrace();
+		}
+		X509TrustManager tm = new X509TrustManager() {
+			public void checkClientTrusted(X509Certificate[] xcs, String string)
+					throws CertificateException {
+			}
+
+			public void checkServerTrusted(X509Certificate[] xcs, String string)
+					throws CertificateException {
+			}
+
+			public X509Certificate[] getAcceptedIssuers() {
+				return null;
+			}
+		};
+		try {
+			ctx.init(null, new TrustManager[] { tm }, null);
+		} catch (KeyManagementException e1) {
+			e1.printStackTrace();
+		}
+		 //javax.net.ssl.SSLSocketFactory
+		 //org.apache.http.conn.ssl.SSLSocketFactory.SSLSocketFactory
+		SSLSocketFactory ssf = new SSLSocketFactory(ctx);
+		return ssf;
+	}
+	public HttpUtil() {
+		//http client init
+		// SSL===========begin
+		ClientConnectionManager ccm = httpClient.getConnectionManager();
+		// register https protocol in httpclient's scheme registry
+		SchemeRegistry sr = ccm.getSchemeRegistry();
+		sr.register(new Scheme("https", 443, getSSLSocketFactory()));
+		// SSL end===========
+		httpClient.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.BROWSER_COMPATIBILITY );
+	}
+	
+	public Log log=LogFactory.getLog(HttpUtil.class);
+	public int resCode;
+	public HttpClient httpClient = new DefaultHttpClient();
+	public HashMap<String,String> cookieMap=new HashMap<String,String>();
+	
+	public JSONObject getResultData(String jsonResult){
+		JSONObject resultObj=JSONObject.fromObject(jsonResult);
+		return resultObj.getJSONObject("data");
+	}
+	
+	public static void main(String[] args) throws My12306Exception{
+		new File("temp/init_text.html").delete();
+		//FileUtils.deleteQuietly();
+		throw new My12306Exception("您的操作频率过快");
+	
+	}
+
+	public String getResourceByPost(Map<String,String> params, String url,String ... savePath) throws My12306Exception{
+		return  (String) getResource("post",params, url,savePath.length>0?savePath[0]:null,savePath.length>1?savePath[1]:null);
+	}
+	public String getResourceByGet(String url,String ... savePath) throws My12306Exception{
+		return  (String) getResource("get",null, url,savePath.length>0?savePath[0]:null,savePath.length>1?savePath[1]:null);
+	}
+	public byte[] getBinaryResourceByGet(String url,String ... savePath) throws My12306Exception{
+		return  (byte[]) getResource("get",null, url,savePath.length>0?savePath[0]:null,savePath.length>1?savePath[1]:null);
+	}
+	public void putCookie(String key,String value){
+		cookieMap.put(key,value);
+	}
+	public void putCookie(String cookieStr){
+		String last=cookieStr.charAt(cookieStr.length()-1)+"";
+		if(last.equals(";")){
+			cookieStr=cookieStr.substring(0,cookieStr.length()-1);
+		}
+		String[] cookievalues=cookieStr.split(";");
+		for(String entr : cookievalues){
+			String[] keyvalue=entr.split("=");
+			putCookie(keyvalue[0],keyvalue[1]);
+		}
+		
+	}
+	public String getCookieStr(){
+		StringBuffer sb=new StringBuffer();
+		for(Map.Entry<String, String> entr : cookieMap.entrySet()){
+			sb.append(entr.getKey()+"="+entr.getValue()+";");
+		}
+		return sb.toString();
+	}
+	String myReferer="";
+	public void setReferer(String referer){
+//		Referer: https://kyfw.12306.cn/otn/leftTicket/init
+		myReferer=referer;
+	}
+	HashMap<String,String> headerMap=new HashMap<String,String>();
+	public void setHeader(String key,String value){
+		headerMap.put(key, value);
+	}
+	
+	public Object getResource(String method,
+			Map<String,String> params, String url,String savePath,String endId) throws My12306Exception {
+		
+		log.info("===============开始======================");
+		log.info(method+"  "+url);
+		if(params!=null && params.size()>0){
+			log.info(method+"参数:"+params.toString());
+		}
+		Date begin = new Date();
+		HttpPost httpPost ="post".equals(method)? new HttpPost(url):null;
+		StringBuffer args=new StringBuffer();
+		if(httpPost!=null){
+			List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+			if(params!=null){
+				for(Map.Entry<String, String> entry:params.entrySet()){
+					nvps.add(new BasicNameValuePair(entry.getKey(),entry.getValue()));
+					args.append(entry.getKey()+"="+entry.getValue()+"&");
+				}
+				args=new StringBuffer(args.substring(0,args.length()-1).toString());
+			}
+			try {
+				httpPost.setEntity(new UrlEncodedFormEntity(nvps,Consts.UTF_8));//,Consts.UTF_8//试下这里加utf-8行不 会不会影响登录验证码验证
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		HttpGet httpGet="get".equals(method)? new HttpGet(url):null;
+		
+		//代理设置
+		if (Cfg.get("https.proxySet") != null && !Cfg.get("https.proxySet").trim().equals("") && Cfg.get("https.proxySet").trim().equals("true")) {
+			((AbstractHttpClient) httpClient)
+					.getCredentialsProvider()
+					.setCredentials(
+							new AuthScope(Cfg.get("https.proxyHost"), Integer
+									.valueOf(Cfg.get("https.proxyPort"))),
+							new UsernamePasswordCredentials("userName",
+									"password"));
+			HttpHost proxy = new HttpHost(Cfg.get("https.proxyHost"),
+					Integer.valueOf(Cfg.get("https.proxyPort")));
+			httpClient.getParams().setParameter(ConnRouteParams.DEFAULT_PROXY,
+					proxy);
+		}
+		
+		HttpResponse res = null;
+		String fileName = null;
+		try {
+			
+			String cookieStr=getCookieStr();
+//			String ck="_jc_save_fromStation=%u6DF1%u5733%2CSZQ; _jc_save_toStation=%u8D63%u5DDE%2CGZG; _jc_save_fromDate=2015-09-19; _jc_save_toDate=2015-09-18; _jc_save_wfdc_flag=dc";
+			if(httpPost!=null){
+			
+//				httpPost.setHeader("Accept", "*/*");
+////				httpPost.setHeader("Cookie", cookieStr+ck);
+				httpPost.setHeader("Cookie",cookieStr);
+				httpPost.setHeader("Referer",myReferer);
+				for(Map.Entry<String, String> entr: headerMap.entrySet()){
+					httpPost.setHeader(entr.getKey(), entr.getValue());
+				}
+				
+				//httpPost.setHeader("Content-Length",args.length()+"");
+//			
+////				httpPost.setHeader("Accept-Encoding", "gzip,deflate,sdch");
+//				httpPost.setHeader("Accept-Language", "zh-CN,zh;q=0.8");
+////				httpPost.setHeader("Cache-Control", "no-cache");
+//				httpPost.setHeader("Connection", "keep-alive");
+//				httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+//				httpPost.setHeader("Host", "kyfw.12306.cn");
+//				httpPost.setHeader("Origin", "https://kyfw.12306.cn");
+////				httpPost.setHeader("If-Modified-Since", "0");
+//				httpPost.setHeader("Referer", "https://kyfw.12306.cn/otn/leftTicket/init");
+//				httpPost.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.143 Safari/537.36");
+//				httpPost.setHeader("X-Requested-With", "XMLHttpRequest");
+				
+
+			}else{
+				
+				httpGet.setHeader("Cookie",cookieStr);
+				httpGet.setHeader("Referer",myReferer);
+				for(Map.Entry<String, String> entr: headerMap.entrySet()){
+					httpGet.setHeader(entr.getKey(), entr.getValue());
+				}
+//				httpGet.setHeader("Accept", "*/*");
+//				httpGet.setHeader("Cookie", cookieStr+ck);
+//				httpGet.setHeader("Accept-Encoding", "gzip,deflate,sdch");
+//				httpGet.setHeader("Accept-Language", "zh-CN,zh;q=0.8");
+//				httpGet.setHeader("Cache-Control", "no-cache");
+//				httpGet.setHeader("Connection", "keep-alive");
+//				httpGet.setHeader("Host", "kyfw.12306.cn");
+//				httpGet.setHeader("If-Modified-Since", "0");
+//				httpGet.setHeader("Referer", "https://kyfw.12306.cn/otn/leftTicket/init");
+//				httpGet.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.143 Safari/537.36");
+//				httpGet.setHeader("X-Requested-With", "XMLHttpRequest");
+			}
+			
+			
+			res = httpClient.execute(httpPost==null?httpGet:httpPost);
+			
+			if(res.getHeaders("Set-Cookie").length>0){
+				StringBuffer sb=new StringBuffer();
+				for(int i=0;i<res.getHeaders("Set-Cookie").length;i++){
+					String[] cookies=res.getHeaders("Set-Cookie")[i].getValue().split(";");
+					for(String c:cookies){
+						String[] value=c.split("=");
+						cookieMap.put(value[0],value[1]);
+					}
+					
+				}
+				for(Map.Entry<String,String> entry:cookieMap.entrySet()){
+					sb.append(entry.getKey()+"="+entry.getValue()+";");
+				}
+				/*if(sb.charAt(sb.length()-1)==';'){
+					cookieStr=sb.substring(0, sb.length()-1);
+				}*/
+				
+				log.info("response set cookie:"+sb.toString());
+				log.info("***********************************************");
+			}
+			String[] contentValue = (res.getEntity().getContentType()==null?"null/null":res.getEntity().getContentType().getValue())
+					.split("/");
+			String action = url.substring(url.lastIndexOf("/") + 1);
+			if (action != null && !"".equals(action)) {
+				Pattern p = Pattern.compile("^([\\w-_])+");
+				Matcher matcher = p.matcher(action);
+				if (matcher.find())
+					action = matcher.group();
+			}
+
+			contentValue = new String[] {
+					contentValue[0],
+					contentValue[1].indexOf(";") > -1 ? contentValue[1]
+							.split(";")[0] : contentValue[1],
+					contentValue[1].indexOf(";") > -1 ? contentValue[1]
+							.split(";")[1] : null };
+			
+			boolean isText="null".equals(contentValue[1]) || "html".equals(contentValue[1])|| "json".equals(contentValue[1]);
+			
+			if(savePath!=null){
+				if(savePath.charAt(savePath.length()-1)!='/'){
+					savePath=savePath+"/";
+				}
+				fileName =savePath + action + "_" + contentValue[0] + (endId==null?"":endId)+"." + (contentValue[1]);// +System.currentTimeMillis()+
+				File dir=new File(savePath);
+				if(!dir.exists() && "true".equals(Cfg.get("debug"))){
+					dir.mkdirs();
+				}
+				
+			}
+			boolean error=false;
+			resCode=res.getStatusLine().getStatusCode();
+			if(resCode==302){
+				//Location:https://kyfw.12306.cn/otn/index/initMy12306
+				String location=res.getHeaders("Location")[0].getValue();
+				EntityUtils.consume(res.getEntity());
+				//getResource(method, params, url, savePath, endId)
+				return getResource("get",null, location,null,null);
+			}/*else if(resCode!=405 && resCode!=200){
+				error=true;
+				EntityUtils.consume(res.getEntity());
+				logExceptionMsg(httpPost==null?httpGet:httpPost,res);
+				throw new My12306Exception("出错啦..."+resCode+"\r\t");
+			}*/
+			String textContent=null;
+			if(isText){
+				List<String> lines=IOUtils.readLines(res.getEntity().getContent());
+				
+				StringBuffer sb=new StringBuffer();
+				for(String s : lines){
+					sb.append("\n"+s);
+				}
+				textContent=sb.toString();
+				log.info("返回内容:"+textContent);
+				error=textContent==null || textContent.indexOf("您的操作频率过快")>-1;
+				if(error){
+					EntityUtils.consume(res.getEntity());
+					throw new My12306Exception("您的操作频率过快");
+				}
+				if(fileName!=null && "true".equals(Cfg.get("debug"))){
+					log.info("保存文件 ："+new File(savePath).getAbsolutePath()+"/"+ fileName);
+					FileUtils.write(new File(fileName), textContent);
+				}
+			}else{
+				//binary
+				log.info("二进制文件类型:"+res.getEntity().getContentType());
+				ByteArrayOutputStream byteos=new ByteArrayOutputStream();
+				InputStream input= res.getEntity().getContent();
+				byte[] data=null;
+				try{
+					int readByte=-1;
+					byte[] buff=new byte[1024];
+					while((readByte=input.read(buff, 0,buff.length))>-1){
+						byteos.write(buff,0,readByte);
+					}
+					data=byteos.toByteArray();
+				}catch(IOException io){
+					io.printStackTrace();
+				}finally{
+					input.close();
+					byteos.close();
+				}
+				
+				return data;
+				/*if(fileName!=null&& "true".equals(Cfg.get("debug"))){
+					log.info("保存文件 ："+new File(savePath).getAbsolutePath()+"/"+ fileName);
+					IOUtils.copy(res.getEntity().getContent(), new FileOutputStream(fileName));
+				}*/
+			}
+			
+			
+			
+			
+			String msg="返回码："+res.getStatusLine()
+					+ " 耗时:"
+					+ ((new Date().getTime() - begin.getTime()) / 1000.0);
+			log.info("Request Header================:");
+			for(Header h : httpPost!=null?httpPost.getAllHeaders():httpGet.getAllHeaders()){
+				String header=h.getName()+": "+h.getValue();
+				log.info(header);
+			}
+			if(httpPost!=null){
+				log.info("Content-Length: "+ httpPost.getEntity().getContentLength());
+				log.info("");
+				log.info(args);
+			}
+			log.info("Response Header================:");
+			for(Header h : res.getAllHeaders()){
+				String header=h.getName()+": "+h.getValue();
+				log.info(header);
+			}
+			/*if(res.getStatusLine().getStatusCode()!=200){
+			}*/
+			log.info("**********************************************");
+			log.info(msg);
+			log.info("===============结束======================");
+
+			//res.getEntity().getContent().close();
+			return isText?textContent:(fileName==null?textContent:fileName);
+			
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	private void logExceptionMsg(HttpRequestBase httpRequestBase,
+			HttpResponse res) {
+		StringBuffer sb=new StringBuffer("\r\t\r\t");//httpRequestBase.getURI().getPath()
+		Header method=res.getFirstHeader("POST")==null?res.getFirstHeader("GET"):res.getFirstHeader("POST");
+		
+		sb.append((method==null?"":method.getName())+" "+(method==null?"":method.getValue())+" "+(res==null?"":res.getStatusLine())+"\r\t异常信息======开始=====================================");
+		sb.append("\r\t===================请求=====================");
+		for(Header  h :httpRequestBase.getAllHeaders()){
+			sb.append("\r\t"+h.getName()+":"+h.getValue());
+		}
+		sb.append("\r\t===================响应=====================");
+		for(Header  h :res.getAllHeaders()){
+			sb.append("\r\t"+h.getName()+":"+h.getValue());
+		}
+		sb.append("\r\t异常信息======结束=====================================\r\t\r\t");
+		log.error(sb);
+	}
+	
+		
+
+}

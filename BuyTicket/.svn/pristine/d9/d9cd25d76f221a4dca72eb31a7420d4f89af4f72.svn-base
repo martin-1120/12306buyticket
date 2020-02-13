@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="BuyTicket"  basedir="." default="4-run" >
+	<property name="src" value="src" />  
+    <property name="classes" value="build/classes" />
+     
+    <path id="exe4j-ant.path" >
+        <!--<pathelement path="D:\Program Files\exe4j\bin\ant.jar" />-->
+        <pathelement path="exe4j\bin\ant.jar" />
+    </path>
+	
+    <pathconvert property="lib" pathsep=" ">  
+        <!--mapper,对路径组合方式进行控制-->  
+        <mapper>  
+            <!--chainedmapper 作用是联合多个mapper-->  
+            <chainedmapper>  
+                <!--过滤文件，将路径去掉，只保留文件名-->  
+                <flattenmapper />  
+                <!--过滤+转换器，将所有的文件名前面都加上一个lib，我们知道lib目录下面有jar包，  
+                    lib/*的作用其实是将jar包名与路径进行组合形成如：lib/google.jar这样的相对路径  
+                 -->  
+                <globmapper from="*" to="lib/*" />  
+            </chainedmapper>  
+        </mapper>  
+        <!--按照mapper定义的格式组合lib目录下面的所有jar文件，形成诸如lib/jar1.jar lib/jar2.jar的字符串-->  
+        <fileset dir="lib">  
+            <include name="*.jar" />  
+        </fileset>  
+    </pathconvert>
+    
+    <property name="libs" value="${lib}" /> 
+
+    <target name="clear">
+	    <delete includeemptydirs="true" failonerror="false">   <!-- verbose="true"  -->
+	      <fileset dir="${classes}">  
+	   		<!--  <include name="${classes}/**"/>   -->
+	      </fileset>  
+	    </delete> 
+        <delete file="buy.jar"/>
+        <delete file="buy.exe"/>
+        <delete file="log.txt"/>
+        <delete file="error.log"/>
+        <delete file="out.map"/>
+        <delete file="out.seeds"/>
+    </target>
+    <target name="1-javac-project" depends="clear">
+        <mkdir dir="${classes}"/>
+        <echo message="javac-project" />
+        <javac srcdir="${src}" destdir="${classes}" includeantruntime="true">
+            <classpath>  
+                <fileset dir="lib">  
+                <!-- <include name="*.jar" />   -->
+                <include name="httpcore-4.4.1.jar"/>
+	            <include name="commons-logging-1.2.jar"/>
+	            <include name="commons-io-2.4.jar"/>
+	            <include name="json-lib-2.2.3-jdk13.jar"/>
+	            <include name="commons-lang-2.4.jar"/>
+	            <include name="ezmorph-1.0.4.jar"/>
+	            <include name="commons-collections-3.2.jar"/>
+	            <include name="commons-beanutils-1.9.2.jar"/>
+	            <include name="log4j-1.2.17.jar"/>
+	            <include name="httpclient-4.5.jar"/>
+	            <include name="commons-configuration-1.10.jar"/>
+                </fileset>
+            </classpath>  
+        </javac> 
+        <copy todir="${classes}">
+		   <fileset dir="${src}">
+		   		 <include name="log4j.properties" />
+		   		 	
+	             <include name="resource" />
+	             <include name="resource/" />
+	             <include name="resource/**" />
+	             <include name="resource/***" />
+	             
+	             <include name="JNLP-INF" />
+	             <include name="JNLP-INF/" />
+	             <include name="JNLP-INF/**" />
+	             <include name="JNLP-INF/***" />
+	       </fileset>
+       </copy>
+         
+    </target>
+		
+	<!--慢-->
+    <!--<target name="jar-project" depends="javac-project">
+        <echo message="jar-project" />
+        <echo message="lib: ${libs}" />
+        <jar jarfile="buy.jar" basedir="${classes}">
+        	<restrict>
+               <name name="**/*.class" />
+               <archives>
+                 <zips>
+                     <fileset dir= "${basedir}/lib" includes= "*.jar" />
+                 </zips>
+               </archives>
+ 			</restrict>
+            <manifest>
+                <attribute name="Main-Class" value="com.buyticket.ui.MainFrm" />  
+                <attribute name="Class-Path" value="${libs}"/>  
+            </manifest>  
+        </jar>
+    </target>-->
+    <!--容易被反编译 -->
+	<!-- <target name="2-jar-project" depends="1-javac-project">
+		<jar destfile="./buy.jar" filesetmanifest="mergewithoutmain">
+	            <manifest>
+	                <attribute name="Main-Class" value="com.buyticket.ui.MainFrm"/>
+	                <attribute name="Class-Path" value="."/>
+	            </manifest>
+	            <fileset dir="./bin"/>
+	            <zipfileset excludes="META-INF/*.*,META-INF/*" src="./lib/httpcore-4.4.1.jar"/>
+	            <zipfileset excludes="META-INF/*.*,META-INF/*" src="./lib/commons-logging-1.2.jar"/>
+	            <zipfileset excludes="META-INF/*.*,META-INF/*" src="./lib/commons-io-2.4.jar"/>
+	            <zipfileset excludes="META-INF/*.*,META-INF/*" src="./lib/json-lib-2.2.3-jdk13.jar"/>
+	            <zipfileset excludes="META-INF/*.*,META-INF/*" src="./lib/commons-lang-2.4.jar"/>
+	            <zipfileset excludes="META-INF/*.*,META-INF/*" src="./lib/ezmorph-1.0.4.jar"/>
+	            <zipfileset excludes="META-INF/*.*,META-INF/*" src="./lib/commons-collections-3.2.jar"/>
+	            <zipfileset excludes="META-INF/*.*,META-INF/*" src="./lib/commons-beanutils-1.9.2.jar"/>
+	            <zipfileset excludes="META-INF/*.*,META-INF/*" src="./lib/log4j-1.2.17.jar"/>
+	            <zipfileset excludes="META-INF/*.*,META-INF/*" src="./lib/httpclient-4.5.jar"/>
+	            <zipfileset excludes="META-INF/*.*,META-INF/*" src="./lib/commons-configuration-1.10.jar"/>
+        </jar>
+	</target> -->
+	
+	<target name="2-jar-project" depends="1-javac-project">
+		 <!-- <echo message="删除temp.jar..."/>
+         <delete file="temp.jar"/> -->
+         <echo message="打包temp.jar..."/> 
+         <jar destfile="./temp.jar" filesetmanifest="mergewithoutmain">
+	            <manifest>
+	                <attribute name="Main-Class" value="com.buyticket.ui.MainFrm"/>
+	                <attribute name="Class-Path" value="."/>
+	            </manifest>
+	            <fileset dir="${classes}"/>
+         </jar>        
+        <echo message="混淆temp.jar..."/>
+        <taskdef resource="proguard/ant/task.properties"  classpath="lib/proguard.jar" />
+     	<delete file="temp-out.jar"/>
+	  	<proguard configuration="applications.pro" />
+	  	<echo message="与lib合并..."/>
+	  	<jar destfile="./buy.jar" filesetmanifest="mergewithoutmain">
+	            <manifest>
+	                <attribute name="Main-Class" value="com.buyticket.ui.MainFrm"/>
+	                <attribute name="Class-Path" value="."/>
+	            </manifest>
+	            <zipfileset src="temp-out.jar"/>
+	            <zipfileset excludes="META-INF/*.*,META-INF/*" src="./lib/httpcore-4.4.1.jar"/>
+	            <zipfileset excludes="META-INF/*.*,META-INF/*" src="./lib/commons-logging-1.2.jar"/>
+	            <zipfileset excludes="META-INF/*.*,META-INF/*" src="./lib/commons-io-2.4.jar"/>
+	            <zipfileset excludes="META-INF/*.*,META-INF/*" src="./lib/json-lib-2.2.3-jdk13.jar"/>
+	            <zipfileset excludes="META-INF/*.*,META-INF/*" src="./lib/commons-lang-2.4.jar"/>
+	            <zipfileset excludes="META-INF/*.*,META-INF/*" src="./lib/ezmorph-1.0.4.jar"/>
+	            <zipfileset excludes="META-INF/*.*,META-INF/*" src="./lib/commons-collections-3.2.jar"/>
+	            <zipfileset excludes="META-INF/*.*,META-INF/*" src="./lib/commons-beanutils-1.9.2.jar"/>
+	            <zipfileset excludes="META-INF/*.*,META-INF/*" src="./lib/log4j-1.2.17.jar"/>
+	            <zipfileset excludes="META-INF/*.*,META-INF/*" src="./lib/httpclient-4.5.jar"/>
+	            <zipfileset excludes="META-INF/*.*,META-INF/*" src="./lib/commons-configuration-1.10.jar"/>
+        </jar>
+        <echo message="buy.jar生成成功！"/>
+        <ant target="gen-keystore"/>
+        <ant target="jarsigner"/>
+        <delete file="temp.jar"/>
+        <delete file="temp-out.jar"/>
+	</target>
+	
+	<taskdef name="exe4j" classname="com.exe4j.Exe4JTask" >
+	        <classpath refid="exe4j-ant.path" />
+	</taskdef>
+	
+	<target name="3-build-exe" depends="2-jar-project" >
+	        <exe4j projectfile="buy.exe4j" />
+	</target>
+	
+	<target name="4-run" depends="3-build-exe">  
+		<exec executable="buy.exe">
+		</exec>
+    </target>
+    
+    <available property="hasKeysotre" file=".keystore" filepath="."/>
+    <target name="gen-keystore" unless="hasKeysotre" description="生成keystore">
+            <exec executable="keytool">
+                   <arg line="-genkey -alias mykey -keypass 123456 -validity 3650 -keystore .keystore -storepass 123456 -dname 'CN=夕星银梦, OU=开发部, O=银河组织, L=深圳, ST=广东省, C=CN'"/>
+            </exec>
+     </target>
+     <target name="jarsigner">
+            <exec executable="jarsigner">
+                   <arg line="-keystore .keystore -storepass 123456 buy.jar mykey"/>
+            </exec>
+     </target>
+     
+     <target name="start-jetty">
+            <exec executable="java">
+                	<arg line="-DSTOP.PORT=8079 -DSTOP.KEY=secret -jar  jetty/start.jar jetty.base=jetty  jetty.port=8080 "/>
+            </exec>
+     </target>
+     <target name="stop-jetty">
+            <exec executable="java">
+                	<arg line="-DSTOP.PORT=8079 -DSTOP.KEY=secret -jar jetty/start.jar --stop "/>
+            </exec>
+     </target>
+     
+     
+     <target name="jnlp-service-start" depends="2-jar-project" description="jnlp发布并且启动jetty">
+        <echo message="copy buy.jar，jnlp文件 到jetty.."/>
+        <copy file="buy.jar" todir="jetty/webapps/ROOT" overwrite="true"/>
+       	<copy file="${src}/JNLP-INF\APPLICATION.JNLP" todir="jetty/webapps/ROOT" overwrite="true"/>
+       	<move file="jetty/webapps/ROOT/APPLICATION.JNLP" tofile="jetty/webapps/ROOT/buyticket.jnlp"/>
+		<echo message="启动 jetty.."/>
+       	<ant target="start-jetty"/>
+  	 </target>
+  	 
+	<target name="test">
+	    <echo message="完成  ...启动测试..."/>
+  	    <exec executable="java">
+              <arg line="-Dfile.encoding=utf-8 -jar jetty/webapps/ROOT/buy.jar "/>
+        </exec>
+	</target>
+</project>

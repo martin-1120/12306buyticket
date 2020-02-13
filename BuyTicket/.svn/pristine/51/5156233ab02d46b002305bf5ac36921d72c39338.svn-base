@@ -1,0 +1,112 @@
+package com.buyticket.ui;
+
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.buyticket.core.Cfg;
+
+public class CfgFrm extends JFrame{
+	/**
+	 * 
+	 */
+	static Log log=LogFactory.getLog(CfgFrm.class);
+	private static final long serialVersionUID = 1L;
+
+	/*chaojiyingUserName=8294-test123456abc
+	chaojiyingPwd=test123
+	
+	https.proxySet=false
+	https.proxyHost=203.110.175.111
+	https.proxyPort=8080*/
+
+	private JButton btnSave=new JButton("保存");//登陆
+	
+	List<JLabel> lblList=new ArrayList<JLabel>();
+	List<JTextField> txtList=new ArrayList<JTextField>();
+	public CfgFrm() {
+		
+		ImageIcon icon=new ImageIcon(getClass().getResource("/resource/img/select.png"));
+		setIconImage(icon.getImage());
+
+		setTitle("设置 ");
+		 
+		List<String> cfgKeys=new ArrayList<String>();
+		Iterator<String> it=Cfg.getConfig().getKeys();
+		while(it.hasNext()){
+			cfgKeys.add( it.next());
+		}
+		
+		
+		setLayout(new GridLayout(cfgKeys.size()+1, 2));
+		for(int i=0;i<cfgKeys.size();i++){
+			String key=cfgKeys.get(i);
+			JLabel lbl=new JLabel(key);
+			JTextField txt=new JTextField(Cfg.get(key));
+			lblList.add(lbl);
+			txtList.add(txt);
+			add(lbl);
+			add(txt);
+		}
+		add(new JLabel(""));
+		add(btnSave);
+		
+		
+		
+		btnSave.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent actionevent) {
+				for(int i=0;i<lblList.size();i++){
+					JLabel lbl=lblList.get(i);
+					JTextField txt=txtList.get(i);
+					Cfg.getConfig().setProperty(lbl.getText(), txt.getText());
+				}
+				Cfg.saveCfg();
+				//JOptionPane.showMessageDialog(CfgFrm.this,"保存成功");
+				CfgFrm.this.setVisible(false);
+				
+			}
+		});
+		
+		//setAlwaysOnTop(true);
+		// frame.setUndecorated(true);
+		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);//EXIT_ON_CLOSE
+		//frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		
+		setResizable(false);
+		pack();
+		//setSize(300,200);
+		//放在pack调整大小之后frame才有width和height
+		/*Toolkit toolkit = Toolkit.getDefaultToolkit();
+		int x = (int)(toolkit.getScreenSize().getWidth()-getWidth())/2;
+		int y = (int)(toolkit.getScreenSize().getHeight()-getHeight())/2;
+		setLocation(x, y);*/
+		setLocationRelativeTo(null);
+		
+		//setVisible(true);
+		/*addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				//srv.loginOut();
+				logCon("退出 登录 ....");
+			}
+		});*/
+	}
+
+	public static void main(String[] args) {
+			/*LoginFrm f=new LoginFrm();
+			f.setVisible(true);*/
+	}
+}

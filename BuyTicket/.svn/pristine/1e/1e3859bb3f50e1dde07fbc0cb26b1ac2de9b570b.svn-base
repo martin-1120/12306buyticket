@@ -1,0 +1,92 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Search sequence entry dialog</title>
+<link href="../../standalone/help_common.css" type="text/css" rel="stylesheet">
+<link href="../../standalone/help.css" type="text/css" rel="stylesheet">
+<script type="text/javascript">
+helpId = 'exe4j.wizard.dialogs.searchSequence';
+indexUrl= '../../index.html';
+</script><script src="../../standalone/jquery.min.js" type="text/javascript"></script><script src="../../standalone/tracking.js" type="text/javascript"></script>
+</head>
+<body>
+<div class="header-container">
+<div class="header-title">
+<h2>Search Sequence Entry Dialog</h2>
+</div>
+<div class="header-nav">
+<div class="nav-wrapper">
+<a title="key: j" href="../../wizard/dialogs/classpath.html" class="nav-left"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: u" href="../../wizard/dialogs/$folder$.html" class="nav-up"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: k" href="../../wizard/dialogs/visual.html" class="nav-right"></a>
+</div>
+</div>
+</div>
+<hr>
+<div class="spacer"></div>
+<div>
+    
+<p>
+      The search sequence entry dialog is shown when clicking on the
+      <img style="vertical-align: middle" align="middle" border="0" src="../../images/add_16.png">&nbsp;add button in the
+      <a href="../../wizard/searchSequence.html">"configure search sequence" step</a> of the 
+      exe4j wizard. Upon closing this dialog with the <b>[OK]</b> button, 
+      a new search sequence entry will be appended to the bottom of the search sequence
+      list of that step.
+    </p>
+    
+<p>
+      To define a search sequence entry, you select the entry type and fill out 
+      the <tt>Detail</tt> section of the dialog which is dependent on the 
+      selected entry type. The following entry types are available:
+    </p>
+    
+<ul>
+<li>
+        
+<img style="vertical-align: middle" align="middle" border="0" src="../../images/sse_registry_16.png">&nbsp;<b>Search registry</b>
+<br>
+        Search the Windows registry for installed JREs and JDKs by Sun Microsystems.
+      </li>
+<li>
+        
+<img style="vertical-align: middle" align="middle" border="0" src="../../images/sse_directory_16.png">&nbsp;<b>Directory</b>
+<br>
+        Look in the specified directory. This is especially useful if you distribute your
+        own JRE along with your application. In that case, be sure to supply a relative path.
+        Note that for path selections by means of the file chooser (<b>[...]</b> button),
+        exe4j will try to convert the path to be relative to the distribution source 
+        directory.
+      </li>
+<li>
+        
+<img style="vertical-align: middle" align="middle" border="0" src="../../images/sse_envvar_16.png">&nbsp;<b>Environment variable</b>
+<br>
+        Look for a JRE of JDK in a location that is defined by an environment variable like
+        <tt>JAVA_HOME</tt> or <tt>MYAPP_JAVA_HOME</tt>.
+      </li>
+</ul>
+    
+  
+</div>
+<br>
+<hr>
+<div class="header-container">
+<div class="header-nav">
+<div class="nav-wrapper">
+<a title="key: j" href="../../wizard/dialogs/classpath.html" class="nav-left"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: u" href="../../wizard/dialogs/$folder$.html" class="nav-up"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: k" href="../../wizard/dialogs/visual.html" class="nav-right"></a>
+</div>
+</div>
+</div>
+</body>
+</html>

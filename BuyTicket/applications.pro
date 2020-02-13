@@ -1,0 +1,100 @@
+#
+# This ProGuard configuration file illustrates how to process applications.
+# Usage:
+#     java -jar proguard.jar @applications.pro
+#
+
+# Specify the input jars, output jars, and library jars.
+-dontwarn
+-ignorewarnings
+
+-injars  temp.jar
+-outjars temp-out.jar
+
+-libraryjars <java.home>/lib/rt.jar
+-libraryjars lib/httpcore-4.4.1.jar
+-libraryjars lib/commons-logging-1.2.jar
+-libraryjars lib/commons-io-2.4.jar
+-libraryjars lib/json-lib-2.2.3-jdk13.jar
+-libraryjars lib/commons-lang-2.4.jar
+-libraryjars lib/ezmorph-1.0.4.jar
+-libraryjars lib/commons-collections-3.2.jar
+-libraryjars lib/commons-beanutils-1.9.2.jar
+-libraryjars lib/log4j-1.2.17.jar
+-libraryjars lib/httpclient-4.5.jar
+-libraryjars lib/commons-configuration-1.10.jar
+#-libraryjars junit.jar
+#-libraryjars servlet.jar
+#-libraryjars jai_core.jar
+#...
+
+# Save the obfuscation mapping to a file, so you can de-obfuscate any stack
+# traces later on. Keep a fixed source file attribute and all line number
+# tables to get line numbers in the stack traces.
+# You can comment this out if you're not interested in stack traces.
+
+-printmapping out.map
+-renamesourcefileattribute SourceFile
+-keepattributes SourceFile,LineNumberTable
+
+# Preserve all annotations.
+
+-keepattributes *Annotation*
+
+# You can print out the seeds that are matching the keep options below.
+
+-printseeds out.seeds
+
+# Preserve all public applications.
+
+-keepclasseswithmembers public class * {
+    public static void main(java.lang.String[]);
+}
+
+# Preserve all native method names and the names of their classes.
+
+-keepclasseswithmembernames,includedescriptorclasses class * {
+    native <methods>;
+}
+
+# Preserve the special static methods that are required in all enumeration
+# classes.
+
+-keepclassmembers,allowoptimization enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
+# Explicitly preserve all serialization members. The Serializable interface
+# is only a marker interface, so it wouldn't save them.
+# You can comment this out if your application doesn't use serialization.
+# If your code contains serializable classes that have to be backward 
+# compatible, please refer to the manual.
+
+-keepclassmembers class * implements java.io.Serializable {
+    static final long serialVersionUID;
+    static final java.io.ObjectStreamField[] serialPersistentFields;
+    private void writeObject(java.io.ObjectOutputStream);
+    private void readObject(java.io.ObjectInputStream);
+    java.lang.Object writeReplace();
+    java.lang.Object readResolve();
+}
+
+-keepclassmembers class com.buyticket.core.HttpService12306{*;}
+-keepclassmembers class com.buyticket.core.HttpService12306$SubmitTokenInfo{*;}
+-keepclassmembers class com.buyticket.core.Cfg{*;}
+-keepclassmembers class com.buyticket.core.ChaoJiYing{*;}
+
+#@com.buyticket.dto.Description <fields>;
+-keep class com.buyticket.dto.* {*;}
+-keep class com.buyticket.dto.ResultData{*;}
+
+-keep class org.**,net.**,mozilla.**{*;}
+#-keep class mozilla.**
+
+# Your application may contain more items that need to be preserved; 
+# typically classes that are dynamically created using Class.forName:
+
+# -keep public class mypackage.MyClass
+# -keep public interface mypackage.MyInterface
+# -keep public class * implements mypackage.MyInterface

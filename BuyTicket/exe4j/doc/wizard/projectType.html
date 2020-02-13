@@ -1,0 +1,80 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>exe4j Wizard - Step 2: Project Type</title>
+<link href="../standalone/help_common.css" type="text/css" rel="stylesheet">
+<link href="../standalone/help.css" type="text/css" rel="stylesheet">
+<script type="text/javascript">
+helpId = 'exe4j.wizard.projectType';
+indexUrl= '../index.html';
+</script><script src="../standalone/jquery.min.js" type="text/javascript"></script><script src="../standalone/tracking.js" type="text/javascript"></script>
+</head>
+<body>
+<div class="header-container">
+<div class="header-title">
+<h2>Exe4j Wizard - Step 2: Project Type</h2>
+</div>
+<div class="header-nav">
+<div class="nav-wrapper">
+<a title="key: j" href="../wizard/welcome.html" class="nav-left"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: u" href="../wizard/$folder$.html" class="nav-up"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: k" href="../wizard/application.html" class="nav-right"></a>
+</div>
+</div>
+</div>
+<hr>
+<div class="spacer"></div>
+<div>
+    
+<p>
+      In this step of the <a href="../wizard/wizard.html">exe4j wizard</a>, you define the project type
+      that determines whether exe4j compiles JAR files into the executable or not.
+    </p>
+    
+<table style="margin-top: 1ex" cellpadding="3" cellspacing="0" border="0">
+<tr>
+<td valign="top"><img style="vertical-align: middle" border="0" src="../images/help_section_bullet_16.png">&nbsp;</td><td>
+      In the <b>regular mode</b>, exe4j is a pure launcher and relies on all JAR files and 
+      resources to be present in the distribution. In other words, the exe4j executable is an
+      <b>addition to your distribution</b>, and not a replacement for it.
+    </td>
+</tr>
+</table>
+    
+<table style="margin-top: 1ex" cellpadding="3" cellspacing="0" border="0">
+<tr>
+<td valign="top"><img style="vertical-align: middle" border="0" src="../images/help_section_bullet_16.png">&nbsp;</td><td>
+      In the <b>JAR in EXE mode</b>, exe4j includes the JAR files specified in the 
+      class path configuration of the <a href="../wizard/java.html">java invocation step</a>
+      into the executable. In this way, you can <b>distribute your application as a single 
+      executable</b> - provided it does not need additional support files and directories.
+      In this mode, you can only select "archive" and "environment variable" in the 
+      <a href="../wizard/dialogs/classpath.html">classpath entry dialog</a>. The JAR files are 
+      extracted to a temporary directory at runtime and deleted after use, the incurred overhead is
+      minimal and usually not noticeable.
+    </td>
+</tr>
+</table>
+  
+</div>
+<br>
+<hr>
+<div class="header-container">
+<div class="header-nav">
+<div class="nav-wrapper">
+<a title="key: j" href="../wizard/welcome.html" class="nav-left"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: u" href="../wizard/$folder$.html" class="nav-up"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: k" href="../wizard/application.html" class="nav-right"></a>
+</div>
+</div>
+</div>
+</body>
+</html>

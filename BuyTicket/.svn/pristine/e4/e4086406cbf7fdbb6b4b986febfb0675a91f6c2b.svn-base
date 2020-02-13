@@ -1,0 +1,10 @@
+# install4j response file for exe4j 5.0.1
+executeLauncherAction$Boolean=true
+sys.adminRights$Boolean=true
+sys.fileAssociation.extensions$StringArray="exe4j"
+sys.fileAssociation.launchers$StringArray="2"
+sys.installationDir=d\:\\Program Files (x86)\\exe4j
+sys.languageId=en
+sys.programGroupAllUsers$Boolean=false
+sys.programGroupDisabled$Boolean=true
+sys.programGroupName=exe4j

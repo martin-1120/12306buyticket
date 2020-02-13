@@ -1,0 +1,49 @@
+telnet kyfw.12306.cn 443
+
+POST /otn/leftTicket/submitOrderRequest HTTP/1.1
+HOST: kyfw.12306.cn
+
+
+telnet localhost 8080
+
+open localhost 8080
+
+GET /a.html HTTP/1.1
+Host:
+
+
+GET /testHttp2/MyServlet?name=lai&code=LYW HTTP/1.1
+HOST: localhost:8080
+
+OPTIONS /testHttp2/MyServlet HTTP/1.1
+HOST: localhost:8080
+
+
+POST /testHttp2/MyServlet HTTP/1.1
+HOST: localhost:8080
+Accept: */*
+
+name=Martin&code=lai123
+
+
+DELETE /testHttp2/MyServlet?name=lai&code=LYW HTTP/1.1
+HOST: localhost:8080
+
+PUT /testHttp2/MyServlet?name=lai&code=LYW HTTP/1.1
+HOST: localhost:8080
+
+HEAD /testHttp2/MyServlet?name=lai&code=LYW HTTP/1.1
+HOST: localhost:8080
+
+TRACE /testHttp2/MyServlet?name=lai&code=LYW HTTP/1.1
+HOST: localhost:8080
+abc: dhh
+
+
+
+DELETE /a.html HTTP/1.1
+HOST: localhost:8080
+
+
+GET /testHttp2/ HTTP/1.1
+HOST: localhost:8080

@@ -1,0 +1,60 @@
+
+openssl s_client -connect kyfw.12306.cn:443
+
+POST /otn/passengers/query HTTP/1.1
+Host: kyfw.12306.cn
+Connection: keep-alive
+Content-Length: 23
+Accept: */*
+Origin: https://kyfw.12306.cn
+X-Requested-With: XMLHttpRequest
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2498.0 Safari/537.36
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+Accept-Language: zh-CN,zh;q=0.8
+Cookie: __NRF=0C4A743D2651BE3F2A0152C8A594FC26; JSESSIONID=0A01D961C49C228198240C035B77F34B2E7A34FDA5; BIGipServerotn=1641611530.50210.0000; _jc_save_fromStation=%u6DF1%u5733%2CSZQ; _jc_save_toStation=%u8D63%u5DDE%2CGZG; _jc_save_fromDate=2015-09-21; _jc_save_toDate=2015-09-20; _jc_save_wfdc_flag=dc; current_captcha_type=Z
+
+pageIndex=1&pageSize=10
+
+Accept-Encoding: gzip, deflate
+Referer: https://kyfw.12306.cn/otn/passengers/init
+
+
+
+POST /otn/leftTicket/submitOrderRequest HTTP/1.1
+Host: kyfw.12306.cn
+Connection: keep-alive
+Content-Length: 442
+Origin: https://kyfw.12306.cn
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2498.0 Safari/537.36
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+Cookie:_jc_save_fromDate=2015-09-21; BIGipServerotn=1641611530.50210.0000;_jc_save_toDate=2015-09-20;_jc_save_toStation=赣州;_jc_save_wfdc_flag=dc;__NRF=0C4A743D2651BE3F2A0152C8A594FC26;_jc_save_fromStation=深圳; JSESSIONID=0A01D961C49C228198240C035B77F34B2E7A34FDA5;
+
+secretStr=MjAxNS0wOS0yMSMwMCNUMzk4IzA2OjAwIzA3OjM1IzY1MDAwMFQzOTgwMSNTWlEjR1pHIzEzOjM1I%2Ba3seWcsyPotaPlt54jMDEjMDYjMTAwNzIwMzExMTQwMTk3MDAwMDIxMDA3MjAwMTU0MzAxMjkwMDAyMiNRNyMxNDQyNzI3OTM2MDExIzE0Mzc3MDE0MDAwMDAjREQ2MUU4RjdCRDQxNzlFRjIzNTI2MDlCRjdFNjNDQjYxM0QxMEJEMDkxMkM2MUQ3NEMxQTlGMUY%3D&train_date=2015-09-21&back_train_date=2015-09-20&tour_flag=dc&purpose_codes=ADULT&query_from_station_name=深圳&query_to_station_name=赣州&undefined
+
+65001         Unicode (UTF-8)
+936          中国 - 简体中文(GB2312)
+
+POST /otn/passengers/query HTTP/1.1
+Host: kyfw.12306.cn
+Connection: keep-alive
+Content-Length: 442
+Accept: */*
+Origin: https://kyfw.12306.cn
+Cookie: __NRF=F361418891D0D9DD9AE38977F86233EC; JSESSIONID=0A01D97098D08296686237C512812446D5AF6F3C8F; BIGipServerotn=1893269770.38945.0000; current_captcha_type=Z; _jc_save_fromStation=%u6DF1%u5733%2CSZQ; _jc_save_toStation=%u8D63%u5DDE%2CGZG; _jc_save_fromDate=2015-09-21; _jc_save_toDate=2015-09-19; _jc_save_wfdc_flag=dc
+Referer:https://kyfw.12306.cn/otn/passengers/init
+
+pageIndex=1&pageSize=10
+
+
+
+
+
+POST /otn/confirmPassenger/initDc HTTP/1.1
+Host: kyfw.12306.cn
+Connection: keep-alive
+Content-Length: 10
+Content-Type: application/x-www-form-urlencoded
+Cookie: JSESSIONID=0A01D95D6005C4858C749868086FDF297887CF35FC; __NRF=88D87F583CBA2933B110D258BA5226BA; BIGipServerotn=1574502666.24610.0000; _jc_save_fromStation=%u6DF1%u5733%2CSZQ; _jc_save_toStation=%u8D63%u5DDE%2CGZG; _jc_save_fromDate=2015-09-28; _jc_save_toDate=2015-09-23; _jc_save_wfdc_flag=dc; current_captcha_type=Z
+
+
+https://kyfw.12306.cn/otn/passcodeNew/getPassCodeNew?module=passenger&rand=randp&0.18357798596844077

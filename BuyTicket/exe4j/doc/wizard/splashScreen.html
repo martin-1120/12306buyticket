@@ -1,0 +1,81 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>exe4j Wizard - Step 7: Configure Splash Screen</title>
+<link href="../standalone/help_common.css" type="text/css" rel="stylesheet">
+<link href="../standalone/help.css" type="text/css" rel="stylesheet">
+<script type="text/javascript">
+helpId = 'exe4j.wizard.splashScreen';
+indexUrl= '../index.html';
+</script><script src="../standalone/jquery.min.js" type="text/javascript"></script><script src="../standalone/tracking.js" type="text/javascript"></script>
+</head>
+<body>
+<div class="header-container">
+<div class="header-title">
+<h2>Exe4j Wizard - Step 7: Configure Splash Screen</h2>
+</div>
+<div class="header-nav">
+<div class="nav-wrapper">
+<a title="key: j" href="../wizard/jdk.html" class="nav-left"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: u" href="../wizard/$folder$.html" class="nav-up"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: k" href="../wizard/messages.html" class="nav-right"></a>
+</div>
+</div>
+</div>
+<hr>
+<div class="spacer"></div>
+<div>
+    
+<p>
+      In this step of the <a href="../wizard/wizard.html">exe4j wizard</a>, you can
+      configure a splash screen for your application.
+    </p>
+    
+<table style="margin-top: 1ex" cellpadding="3" cellspacing="0" border="0">
+<tr>
+<td valign="top"><img style="vertical-align: middle" border="0" src="../images/help_section_bullet_16.png">&nbsp;</td><td>
+      
+        If the "Show splash screen" check box is selected, the Java splash screen is shown with the specified
+        image file. If you decide to display a splash screen, you have to enter an image file.
+        The file format can be PNG, GIF or Windows BMP.
+      
+      <p>
+        Please note that you cannot specify the <code>-splash:</code> VM parameter in the
+        <a href="../wizard/java.html">"Java Invocation" step</a>, since this VM parameter is parsed by the
+        default Java launchers (<tt>java.exe</tt> and <tt>javaw.exe</tt>) which are not used by exe4j.
+      </p>
+      
+<p>
+        If you select the "Native splash screen" option, the launcher will use its own implementation
+        of a splash screen that can be shown extremely quickly. The native splash screen does not support
+        translucent images. In that case, you cannot use the <tt>java.awt.SplashScreen</tt>
+        API to modify the splash screen. However, the <a href="../wizard/splashScreenOptions.html">text lines</a>
+        on the splash screen work with the native splash screen as well.
+      </p>
+    
+</td>
+</tr>
+</table>
+  
+</div>
+<br>
+<hr>
+<div class="header-container">
+<div class="header-nav">
+<div class="nav-wrapper">
+<a title="key: j" href="../wizard/jdk.html" class="nav-left"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: u" href="../wizard/$folder$.html" class="nav-up"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: k" href="../wizard/messages.html" class="nav-right"></a>
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,6 @@
+keytool -genkey -keystore .keystore -alias mykey -keypass 123456
+jarsigner -keystore .keystore buy.jar mykey
+
+
+一次性生成:
+keytool -genkey -alias mykey -keypass 123456 -validity 3650 -keystore .keystore -storepass 123456 -dname "CN=夕星银梦, OU=开发部, O=银河组织, L=深圳, ST=广东省, C=CN"

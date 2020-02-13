@@ -1,0 +1,82 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Welcome to exe4j!</title>
+<link href="standalone/help_common.css" type="text/css" rel="stylesheet">
+<link href="standalone/help.css" type="text/css" rel="stylesheet">
+<script type="text/javascript">
+helpId = 'exe4j.welcome';
+indexUrl= 'index.html';
+</script><script src="standalone/jquery.min.js" type="text/javascript"></script><script src="standalone/tracking.js" type="text/javascript"></script>
+</head>
+<body>
+<div class="header-container">
+<div class="header-title">
+<h2>Welcome To Exe4j!</h2>
+</div>
+<div class="header-nav">
+<div class="nav-wrapper"></div>
+<div class="nav-wrapper">
+<a title="key: k" href="licensing.html" class="nav-right"></a>
+</div>
+</div>
+</div>
+<hr>
+<div class="spacer"></div>
+<div>
+    
+<table style="margin-top: 1ex" cellpadding="3" cellspacing="0" border="0">
+<tr>
+<td valign="top"><img style="vertical-align: middle" border="0" src="images/help_section_bullet_16.png">&nbsp;</td><td>
+      
+        exe4j creates Windows executables that invoke your Java applications and
+        integrates them into the Windows environment.
+      
+      <p>
+        The use of exe4j s use is not time limited, but restricted to evaluation purposes.
+        Evaluation warnings are removed after <a href="licensing.html">purchasing an exe4j license</a>.
+      </p>
+    
+</td>
+</tr>
+</table>
+    
+<table style="margin-top: 1ex" cellpadding="3" cellspacing="0" border="0">
+<tr>
+<td valign="top"><img style="vertical-align: middle" border="0" src="images/help_section_bullet_16.png">&nbsp;</td><td><b>Quick start</b>
+<br>
+      
+<ul>
+<li>
+          To get an overview of exe4j's features, please have a look at the 
+          sample projects in the <tt>demo</tt> directory of your exe4j installation.
+        </li>
+<li>
+          When starting exe4j, a <a href="wizard/wizard.html">wizard</a> will guide you
+          step by step through collecting the necessary information to create your
+          executable.
+        </li>
+<li>
+          A <a href="cli/cli.html">command line compiler</a> is available to facilitate
+          the inclusion of exe4j into an automated build process like
+          <a href="cli/ant.html">ant</a>.
+        </li>
+</ul>
+    
+</td>
+</tr>
+</table>
+  
+</div>
+<br>
+<hr>
+<div class="header-container">
+<div class="header-nav">
+<div class="nav-wrapper"></div>
+<div class="nav-wrapper">
+<a title="key: k" href="licensing.html" class="nav-right"></a>
+</div>
+</div>
+</div>
+</body>
+</html>

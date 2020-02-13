@@ -1,0 +1,83 @@
+package com.buyticket.dto;
+
+import com.buyticket.core.My12306Exception;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
+
+public class MyOrdersDTO extends BaseDTO {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	/*{"validateMessagesShowId":"_validatorMessage","status":true,"httpstatus":200,
+		"data":{"orderDBList":[{"sequence_no":"E855155171","order_date":"2015-11-30 21:37:42"
+		,"ticket_totalnum":1,"ticket_price_all":37200.0,"cancel_flag":"Y",
+		"resign_flag":"4","return_flag":"N","print_eticket_flag":"N","pay_flag":"Y","pay_resign_flag":"N",
+		"confirm_flag":"N",
+		"tickets":[{"stationTrainDTO":{"trainDTO":{},"station_train_code":"Z182",
+		"from_station_telecode":"BJQ","from_station_name":"深圳东","start_time":"1970-01-01 10:20:00",
+		"to_station_telecode":"GZG","to_station_name":"赣州","arrive_time":"1970-01-01 16:07:00","distance":"503"}
+		,"passengerDTO":{"passenger_name":"赖扬文","passenger_id_type_code":"1",
+		"passenger_id_type_name":"二代身份证","passenger_id_no":"36070219921120063X","total_times":"98"}
+		,"ticket_no":"E8551551711050151","sequence_no":"E855155171","batch_no":"1","train_date":"2015-12-01 00:00:00",
+		"coach_no":"05","coach_name":"05","seat_no":"0151","seat_name":"15号下铺","seat_flag":"0","seat_type_code":"6
+		","seat_type_name":"高级软卧","ticket_type_code":"1","ticket_type_name":"成人票","reserve_time":"2015-11-30 21:37:42","limit_time":"2015-11-30 21:37:42","lose_time":"2015-11-30 22:07:43","pay_limit_time":"2015-11-30 22:07:43","ticket_price":37200.0,"print_eticket_flag":"N","resign_flag":"4","return_flag":"N","confirm_flag":"N","pay_mode_code":"Y","ticket_status_code":"i","ticket_status_name":"待支付","cancel_flag":"Y","amount_char":0,"trade_mode":"","start_train_date_page":"2015-12-01 10:20","str_ticket_price_page":"372.0","come_go_traveller_ticket_page":"N","return_deliver_flag":"N","deliver_fee_char":"","is_need_alert_flag":false,"is_deliver":"N","dynamicProp":"","fee_char":"","insure_query_no":""}],"reserve_flag_query":"p","if_show_resigning_info":"N","recordCount":"1","isNeedSendMailAndMsg":"N","array_passser_name_page":["赖扬文"],"from_station_name_page":["深圳东"],"to_station_name_page":["赣州"],"start_train_date_page":"2015-12-01 10:20","start_time_page":"10:20","arrive_time_page":"16:07","train_code_page":"Z182","ticket_total_price_page":"372.0","come_go_traveller_order_page":"N","canOffLinePay":"N","if_deliver":"N","insure_query_no":""}]
+		,"to_page":"db"},"messages":[],"validateMessages":{}}*/
+	private JSONObject obj;
+	public MyOrdersDTO(JSONObject obj){
+		this.obj=obj;
+	}
+	
+	public MyOrdersDTO() {
+	}
+	public String[] getSequence_no(){
+		if(this.obj!=null && !this.obj.isNullObject()){
+			JSONArray orderList =obj.getJSONArray("orderDBList");
+			String[] arr=new String[orderList.size()];
+			for(int i=0;i<orderList.size();i++){
+				JSONObject order=orderList.getJSONObject(i);
+				//sequence_no : "E855155171"
+				arr[i]=order.getString("sequence_no");
+			}
+			return arr;
+		}
+		return null;
+	}
+	
+	public String getOrderInfo() throws My12306Exception{
+		StringBuffer sb=new StringBuffer();
+		if(this.obj!=null && !this.obj.isNullObject()){
+			
+			if(obj.containsKey("orderCacheDTO")){
+				//{"validateMessagesShowId":"_validatorMessage","status":true,"httpstatus":200,"data":{"orderCacheDTO":{"requestId":6079448006744768853,"userId":1500037939541,"number":5651,"tourFlag":"dc","requestTime":"2015-12-07 09:55:55","queueOffset":10243613340,"queueName":"26_ORDER_Q7_1","trainDate":"2016-02-04 00:00:00","startTime":"1970-01-01 20:05:00","stationTrainCode":"Z186","fromStationCode":"SZQ","fromStationName":"深圳","toStationCode":"GZG","toStationName":"赣州","status":1,"modifyTime":"2015-12-07 09:55:55","tickets":[{"seatTypeName":"硬座","seatTypeCode":"1","ticketTypeName":"成人票","passengerName":"赖扬文","passengerIdTypeName":"二代身份证"}],"waitTime":8,"waitCount":1196,"ticketCount":1,"startTimeString":"2016-02-04 20:05","array_passser_name_page":["赖扬文"]},"to_page":"cache"},"messages":[],"validateMessages":{}}
+				String msg="";
+				if(obj.getJSONObject("orderCacheDTO").containsKey("message")){
+					msg = obj.getJSONObject("orderCacheDTO").getJSONObject("message").getString("message");
+				}
+				throw new My12306Exception(msg);
+			}
+			JSONArray orderList =obj.getJSONArray("orderDBList");
+			  
+			for(int i=0;i<orderList.size();i++){
+				JSONObject order=orderList.getJSONObject(i);
+				//sequence_no : "E855155171"
+				sb.append(order.getString("sequence_no")+"   ");
+				sb.append(order.getString("train_code_page")+"   \t"+ order.getString("start_train_date_page")+"-"+order.getString("arrive_time_page")+"\t");
+				sb.append("   ￥"+order.getString("ticket_total_price_page")+"   ");
+				
+				JSONArray ticketList =order.getJSONArray("tickets");
+				for(int j=0;j<ticketList.size();j++){
+					JSONObject ticket=ticketList.getJSONObject(j);
+					sb.append(ticket.getJSONObject("passengerDTO").getString("passenger_name")+"  "+ticket.getString("seat_name")+" "+ticket.getString("seat_type_name")+" "+ticket.getString("ticket_type_name")+" "+ticket.getString("ticket_status_name")+"  请在之前付款:"+ticket.getString("pay_limit_time"));
+				}
+				
+			}
+			
+		}
+		return sb.toString();
+				
+	}
+	
+}

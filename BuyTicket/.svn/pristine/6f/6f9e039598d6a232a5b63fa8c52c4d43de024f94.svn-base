@@ -1,0 +1,634 @@
+package com.buyticket.core;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.buyticket.dto.MyOrdersDTO;
+import com.buyticket.dto.QueryLeftNewDTO;
+import com.buyticket.dto.ResultData;
+import com.buyticket.dto.TicketPriceDTO;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sf.json.util.JSONUtils;
+
+public class HttpService12306 {
+	Log log=LogFactory.getLog(HttpService12306.class);
+	public final static String UrlPrefix="https://kyfw.12306.cn";
+	HttpUtil http=new HttpUtil();
+	
+	ResultData result=null;
+	public boolean isLogin=false;
+	
+	public byte[] getRandCode(String module,String rand) throws My12306Exception{
+		byte[] imgdata=http.getBinaryResourceByGet("https://kyfw.12306.cn/otn/passcodeNew/getPassCodeNew?module="
+				+ module + "&rand=" + rand + "&"
+				+ new Random().nextFloat(), "temp");
+		return imgdata;
+	}
+	public byte[] getLoginRandCode() throws My12306Exception{
+		String module = "login";
+		String rand = "sjrand";
+		return getRandCode(module,rand);
+	}
+	public byte[] getBuyRandCode() throws My12306Exception{
+		String module = "passenger";
+		String rand = "randp";
+		return getRandCode(module,rand);
+	}
+	public boolean checkLoginRandCode(String randCode) throws My12306Exception{
+		HashMap<String,String> params=new HashMap<String,String>();
+		params.put("randCode", randCode);
+		params.put("rand", "sjrand");
+		
+		log.info("坐标：" + randCode);
+		result=new ResultData(http.getResourceByPost(params,UrlPrefix+"/otn/passcodeNew/checkRandCodeAnsyn"));
+		if("1".equals(result.getDataObj().getString("result"))){
+			log.info("验证码  验证成功.....");
+			return true;
+		}else{
+			log.info("重新输入..."+randCode);
+			return false;
+		}
+	}
+	public boolean checkBuyRandCode(String randCode,String REPEAT_SUBMIT_TOKEN) throws My12306Exception{
+		HashMap<String,String> params=new HashMap<String,String>();
+		params.put("randCode", randCode);
+		params.put("rand", "randp");
+		//购票验证码 需要的额外的令牌
+		params.put("REPEAT_SUBMIT_TOKEN", REPEAT_SUBMIT_TOKEN);
+		
+		log.info("坐标：" + randCode);
+		result=new ResultData(http.getResourceByPost(params,UrlPrefix+"/otn/passcodeNew/checkRandCodeAnsyn"));
+		if("1".equals(result.getDataObj().getString("result"))){
+			//frame.setVisible(false);
+			//frame.setTitle(null);
+			//picDialog.close();
+			log.info("验证码  验证成功.....");
+			//picDialog.isPass();
+			return true;
+		}else{
+			//picDialog.isNotPass();
+			log.info("重新输入..."+randCode);
+//			picDialog.setTitle("验证失败重新输入...   ");
+			return false;
+		}
+	}
+	
+	public void loginInit() throws My12306Exception{
+		//GET https://kyfw.12306.cn/otn/login/init HTTP/1.1
+		http.getResourceByGet(UrlPrefix+"/otn/login/init");//大爷的 什么时候这里做了手脚，一定要这个东西后面才能登陆，我擦你大爷的，害老子耽误那么久时间，坑
+		http.getResourceByGet(UrlPrefix+"/otn/dynamicJs");//虽然这个可以不用，保险起见还是跟网站逻辑保持一致吧
+			
+	}
+
+	public boolean login(String uname,String pwd,String randCode) throws My12306Exception{
+		
+		HashMap<String,String> params=new HashMap<String,String>();
+		
+		params.put("loginUserDTO.user_name",uname);//URLEncoder.encode(uname)
+		params.put("userDTO.password",pwd);
+		params.put("randCode",randCode);//URLEncoder.encode(randCode)
+//		http.setReferer("https://220.112.197.91/otn/login/init");//"https://kyfw.12306.cn/otn/login/init"
+//		http.setHeader("Origin", "https://kyfw.12306.cn");
+//		http.setHeader("X-Requested-With", "XMLHttpRequest");
+//		http.setHeader("Host", "kyfw.12306.cn");
+//		http.setHeader("Connection", "Close");
+//		http.setHeader("Accept", "*/*");
+//		http.setHeader("User-Agent","Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36");
+		try{
+			result =new ResultData(http.getResourceByPost(params,UrlPrefix+"/otn/login/loginAysnSuggest"));
+		}catch(Exception e){
+			result =new ResultData(http.getResourceByPost(params,UrlPrefix+"/otn/login/loginAysnSuggest"));
+		}
+		
+		if(result.getDataObj().getString("loginCheck").equals("Y")){
+			//set cookie
+			http.getResourceByPost(null,UrlPrefix+"/otn/login/userLogin","temp");
+			//302重定向
+			//http.getResourceByGet(UrlPrefix+"/otn/index/initMy12306","temp");
+			log.info("登陆成功.....");
+			isLogin=true;			
+		}else{
+			isLogin=false;		
+			log.error("登陆失败:"+result);
+		}
+		return isLogin;
+	}
+	
+	public String initMy12306() throws My12306Exception{
+		String result=http.getResourceByGet(UrlPrefix+"/otn/index/initMy12306");
+		return result;
+	}
+	
+	public String refreshInitInfo() throws My12306Exception{
+		String savePath=http.getResourceByGet(UrlPrefix+"/otn/leftTicket/init","temp/");
+		return savePath;
+	}
+	public String[] refreshStationJS()throws My12306Exception{
+		File intiFile=new File("temp/init_text.html");
+		if(!intiFile.exists()){
+			refreshInitInfo();
+			log.info("不存在temp/init_text.html");
+		}else{
+			log.info("存在temp/init_text.html"+intiFile.getAbsolutePath());
+		}
+		String favoriteJs=null, stationJs=null;
+		try {
+			
+			String html=FileUtils.readFileToString(intiFile);
+			log.info("temp/init_text.html内容:\r\t"+html);
+			Pattern p=Pattern.compile("<script .* src=\"(.*favorite_name\\.js.*)\" .*></script>",Pattern.MULTILINE);
+			Matcher m=p.matcher(html);
+			if(m.find()){					
+				favoriteJs= m.group(1);
+				favoriteJs=http.getResourceByGet(UrlPrefix+favoriteJs,"temp/");//temp/favorite_name_text.javascript
+			}else{
+				log.error("可能刷新平率过快  没有找到--src=\"(.*favorite_name\\.js.*)-从temp/init_text.html：");
+				intiFile.deleteOnExit();
+			}
+			
+			
+			p=Pattern.compile("<script .* src=\"(.*station_name\\.js.*)\" .*></script>",Pattern.MULTILINE);
+			m=p.matcher(html);
+			if(m.find()){					
+				stationJs= m.group(1);
+				stationJs=http.getResourceByGet(UrlPrefix+stationJs,"temp/");//temp/station_name_text.javascript
+			}else{
+				log.error("可能刷新平率过快  没有找到--src=\"(.*station_name\\.js.*)-从temp/init_text.html");
+				intiFile.deleteOnExit();
+			}	
+				
+			
+			//
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+			
+		
+		//<script type="text/javascript" src="/otn/resources/js/framework/station_name.js?station_version=1.8398" xml:space="preserve"></script>
+		return new String[]{favoriteJs,stationJs};
+	}
+	
+	public String[] getStaionNames() throws My12306Exception {
+		String favoriteNameJsPath="temp/favorite_name_text.javascript";
+		String stationNameJsPath="temp/station_name_text.javascript";
+		File favoriteNameJsFile=new File(favoriteNameJsPath);
+		File stationNameJsFile=new File(stationNameJsPath);
+		if(!stationNameJsFile.exists() || !favoriteNameJsFile.exists()){
+			refreshStationJS();
+		}
+		try {
+			String favoriteName=JSEngineUtil.getFavoriteName(favoriteNameJsPath);
+			String stationName=JSEngineUtil.getStationName(stationNameJsPath);
+			return new String[]{favoriteName,stationName};
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public boolean loginUseSession(String cookie) throws My12306Exception{
+		try{
+		//http=new HttpUtil();
+ 
+		http.putCookie(cookie);//"__NRF=F361418891D0D9DD9AE38977F86233EC;JSESSIONID=0A01D97098C90748C07FAFA5B1D560A4479B411DF2;"
+		//http.setHeader("Accept","*/*");
+		//http.setHeader("Accept-Encoding","gzip, deflate, br");
+		//http.setHeader("Accept-Language","zh-CN,zh;q=0.8");
+		//http.setHeader("Connection","keep-alive");
+		//http.setHeader("Content-Length","23");
+		//http.setHeader("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");
+		
+		//http.setHeader("Cookie","JSESSIONID=39F1E432A1286F2F79D6AB05D667A3A3;BIGipServerotn=2632450314.38945.0000;");//这样是可以的
+		//http.setHeader("Host","kyfw.12306.cn");
+		//http.setHeader("Origin","https://kyfw.12306.cn");
+		//http.setHeader("Referer","https://kyfw.12306.cn/otn/passengers/init");
+		//http.setHeader("User-Agent","Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36");
+		//http.setHeader("X-Requested-With","XMLHttpRequest");
+
+		
+		
+		JSONArray arr=queryPassengers();
+		if(arr.size()>0){
+			return true;
+		}
+		}catch(My12306Exception e){
+			throw e;
+		}catch(Exception e){
+			return false;
+		}
+		return false;
+	}
+	/**
+	 * 
+	 * @param fromStation SZQ
+	 * @param toStation GZG
+	 * @param date 2015-09-05
+	 * @return
+	 * @throws Exception 
+	 */
+	JSONArray trainNoArr=null;
+	public List<QueryLeftNewDTO> queryTicket(String fromStation,String toStation,String date) throws My12306Exception{
+		String content=null;
+		try{
+		//查询2015-09-05 深圳->赣州
+		//getResourceByGet("https://kyfw.12306.cn/otn/leftTicket/log?leftTicketDTO.train_date=2015-09-05&leftTicketDTO.from_station=SZQ&leftTicketDTO.to_station=GZG&purpose_codes=ADULT");
+//		"https://kyfw.12306.cn/otn/leftTicket/query?leftTicketDTO.train_date=2015-09-05&leftTicketDTO.from_station=SZQ&leftTicketDTO.to_station=GZG&purpose_codes=ADULT"
+			//http.setHeader("Host", "kyfw.12306.cn");
+			//http.setHeader("Upgrade-Insecure-Requests", "1");
+			//http.getResourceByGet(UrlPrefix+"/otn/leftTicket/log?leftTicketDTO.train_date="+date+"&leftTicketDTO.from_station="+fromStation+"&leftTicketDTO.to_station="+toStation+"&purpose_codes=ADULT","temp");
+			content=http.getResourceByGet(UrlPrefix+"/otn/leftTicket/queryA?leftTicketDTO.train_date="+date+"&leftTicketDTO.from_station="+fromStation+"&leftTicketDTO.to_station="+toStation+"&purpose_codes=ADULT","temp");
+			ResultData result=new ResultData(content);
+			
+			trainNoArr=JSONArray.fromObject(result.getDataArr());
+			List<QueryLeftNewDTO> lst=new ArrayList<QueryLeftNewDTO>();
+			if(trainNoArr!=null && trainNoArr.size()>0){
+				for(int i=0;i<trainNoArr.size();i++){
+					if(!trainNoArr.getJSONObject(i).isNullObject()){
+						lst.add(new QueryLeftNewDTO(trainNoArr.getJSONObject(i)));
+					}
+				}
+			}
+			
+			return lst;
+		}catch (My12306Exception e){
+			throw e;
+		}catch(Exception e){
+			e.printStackTrace();
+			throw new My12306Exception(result.getErrorMessage());
+		}
+		
+	}
+	public void putCookie(String cookieStr){
+		http.putCookie(cookieStr);
+	}
+	
+//	String[] passagersSetting=null;
+//	String[] trainNosSetting=null;
+	
+	SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+	public String msg=null;
+	public class SubmitTokenInfo{
+		public String globalRepeatSubmitToken;
+		public JSONObject ticketInfoForPassengerForm;
+		public JSONObject orderRequestDTO;
+		public SubmitTokenInfo(
+				String globalRepeatSubmitToken,
+				JSONObject ticketInfoForPassengerForm,
+				JSONObject orderRequestDTO
+				){
+			this.globalRepeatSubmitToken=globalRepeatSubmitToken;
+			this.ticketInfoForPassengerForm=ticketInfoForPassengerForm;
+			this.orderRequestDTO=orderRequestDTO;
+		}
+	}
+	public SubmitTokenInfo getGlobalRepeatSubmitToken(String secretStr,String train_date,String back_train_date,String tour_flag,String purpose_codes,String query_from_station_name,String query_to_station_name) throws My12306Exception{
+			
+			http.getResourceByPost(null,UrlPrefix+"/otn/login/checkUser");			
+			
+			HashMap<String,String> params=new HashMap<String,String>();
+			params.put("secretStr",secretStr);//加密字段，每查询一次，同一趟车都是不同的
+			params.put("train_date", train_date);//出发时间
+			params.put("back_train_date", back_train_date);//返回日期
+			
+			params.put("tour_flag", tour_flag);//dc 单程
+			params.put("purpose_codes", purpose_codes);//ADULT 成年人
+			params.put("undefined", "");//
+			
+			//坑爹的406 一直以为12306搞得鬼     原来是中文参数导致的，我草
+			params.put("query_from_station_name",query_from_station_name);//URLEncoder.encode(query_from_station_name, "utf-8")
+			params.put("query_to_station_name", query_to_station_name);//URLEncoder.encode(query_to_station_name, "utf-8")
+			
+			//http.setReferer( "https://kyfw.12306.cn/otn/leftTicket/init");
+			//Referer: https://kyfw.12306.cn/otn/leftTicket/init
+			//http.setHeader("Host", "kyfw.12306.cn");
+			//http.setHeader("Origin", "https://kyfw.12306.cn");
+			//http.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2498.0 Safari/537.36");
+			//http.setHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+			//http.setHeader("Connection", "keep-alive");
+			String content=http.getResourceByPost(params,UrlPrefix+"/otn/leftTicket/submitOrderRequest");
+			
+			ResultData result=new ResultData(content);
+			
+			if(!result.isStatus()){
+				msg="submitOrderRequest  失败!"+result.getErrorMessage();
+				log.error(msg);
+				return null;
+			}
+			
+			JSONObject ticketInfoForPassengerForm=null;
+			JSONObject orderRequestDTO=null;
+			String globalRepeatSubmitToken=null;
+		
+			//不然据说会非法访问
+			params.clear();
+			params.put("_json_att=","");
+			String html=http.getResourceByPost(params,UrlPrefix+"/otn/confirmPassenger/initDc");
+			//"temp/initDc_text.html"
+			
+			//车票 订单信息
+			ticketInfoForPassengerForm=findJsonFromHtml(html, "var ticketInfoForPassengerForm=(.*);");
+			orderRequestDTO=findJsonFromHtml(html, "var orderRequestDTO=(.*);");
+			
+			globalRepeatSubmitToken=findStrFromHtml(html, "var globalRepeatSubmitToken\\s*=\\s*'(.*)';");
+			
+			/*if(globalRepeatSubmitToken==null){
+				msg="initDc 失败   没有 globalRepeatSubmitToken ";
+				log.error(msg);
+				
+			}*/
+			
+			
+			return new SubmitTokenInfo(globalRepeatSubmitToken,ticketInfoForPassengerForm,orderRequestDTO);
+			/*Map<String,Object> ret=new HashMap<>();
+			ret.put("globalRepeatSubmitToken", globalRepeatSubmitToken);
+			ret.put("isSucc", isSucc);
+			
+			return ret;*/
+	}
+	public boolean buy(String randCode,String globalRepeatSubmitToken,JSONObject ticketInfoForPassengerForm,JSONObject orderRequestDTO,String secretStr,String train_date,String back_train_date,String tour_flag,String purpose_codes,String query_from_station_name,String query_to_station_name,String[] passagers,String seatType) throws My12306Exception{
+		
+		
+		String passengerTicketStr=getPassengerTicketStr(passagers,seatType);
+		String oldPassengerStr=getOldPassengerStr(passagers);
+		//检查订单
+		
+		Map<String,String> params=new HashMap<>();
+		params.put("cancel_flag","2");			
+		params.put("bed_level_order_num","000000000000000000000000000000");	
+		//passengerTicketStr 座位编号,0,票类型,乘客名,证件类型,证件号,手机号码,保存常用联系人(Y或N) _分隔
+//		"3,0,1,赖扬文,1,36070219921120063X,13049853872,N_3,0,1,胡微微,1,360730199103125914,,N"
+		params.put("passengerTicketStr",passengerTicketStr);	
+		//乘客名,证件类型,证件号,乘客类型
+		params.put("oldPassengerStr",oldPassengerStr);//"赖扬文,1,36070219921120063X,1_胡微微,1,360730199103125914,1_"
+		params.put("tour_flag",tour_flag);			
+		params.put("randCode",randCode);			
+		params.put("REPEAT_SUBMIT_TOKEN",globalRepeatSubmitToken);			
+		result= new ResultData( http.getResourceByPost(params,UrlPrefix+"/otn/confirmPassenger/checkOrderInfo","temp"));
+		
+		if(result.getDataObj().getBoolean("submitStatus")){
+			msg="checkOrderInfo  成功!";
+			log.info(msg);
+		}else{
+			msg="checkOrderInfo  失败!"+result.getErrorMessage();
+			log.error(msg);
+			return false;
+		}
+	
+		
+		//有充足的票可以继续     
+		//post https://kyfw.12306.cn/otn/confirmPassenger/confirmSingleForQueue
+		params.clear();
+		params.put("train_date",sdf.format(new Date(orderRequestDTO.getJSONObject("train_date").getLong("time"))));
+		params.put("train_no", orderRequestDTO.getString("train_no"));
+		params.put("stationTrainCode", orderRequestDTO.getString("station_train_code"));
+		params.put("seatType", ticketInfoForPassengerForm.getJSONObject("limitBuySeatTicketDTO").getJSONArray("seat_type_codes").getJSONObject(0).getString("id"));//硬座1
+		params.put("fromStationTelecode",orderRequestDTO.getString("from_station_telecode"));
+		params.put("toStationTelecode",orderRequestDTO.getString("to_station_telecode"));
+		params.put("leftTicket",ticketInfoForPassengerForm.getJSONObject("queryLeftTicketRequestDTO").getString("ypInfoDetail"));
+		params.put("purpose_codes",ticketInfoForPassengerForm.getString("purpose_codes"));//ADULT 成人"00"
+		params.put("_json_att","");
+		params.put("REPEAT_SUBMIT_TOKEN",globalRepeatSubmitToken);
+		http.getResourceByPost(params, UrlPrefix+"/otn/confirmPassenger/getQueueCount"); 
+		//INFO core.HttpUtil (getResource:162) - post  https://kyfw.12306.cn/otn/confirmPassenger/getQueueCount
+		//INFO core.HttpUtil (getResource:164) - post参数:{_json_att=, leftTicket=1007203000401970000010072000363012900001, train_date=2016-09-29, seatType=3, REPEAT_SUBMIT_TOKEN=6ae6bf2a2163910b75f1bcd97186e552, toStationTelecode=GZG, fromStationTelecode=SZQ, stationTrainCode=K446, purpose_codes=00, train_no=650000K4460F}
+		//{"validateMessagesShowId":"_validatorMessage","url":"/leftTicket/init","status":false,"httpstatus":200,"messages":["系统忙，请稍后重试"],"validateMessages":{}}
+		//根据js根据排队人数和 该趟列车 该座位剩余数量判断是否还有余票 
+		//提交订单
+		params.clear();
+		params.put("passengerTicketStr",passengerTicketStr);//"3,0,1,赖扬文,1,36070219921120063X,13049853872,N_3,0,1,胡微微,1,360730199103125914,,N"
+		params.put("oldPassengerStr",oldPassengerStr);//"赖扬文,1,36070219921120063X,1_胡微微,1,360730199103125914,1_"
+		params.put("randCode", randCode);
+		params.put("purpose_codes", ticketInfoForPassengerForm.getString("purpose_codes"));//成人"00"
+		params.put("key_check_isChange",ticketInfoForPassengerForm.getString("key_check_isChange"));
+		params.put("leftTicketStr",ticketInfoForPassengerForm.getString("leftTicketStr"));
+		params.put("train_location",ticketInfoForPassengerForm.getString("train_location"));
+		params.put("roomType","00");
+		params.put("dwAll","N");
+		params.put("_json_att","");
+		params.put("REPEAT_SUBMIT_TOKEN",globalRepeatSubmitToken);
+		result = new ResultData(http.getResourceByPost(params, UrlPrefix+"/otn/confirmPassenger/confirmSingleForQueue"));
+		if(result.getDataObj().getBoolean("submitStatus")){
+			msg="confirmSingleForQueue 成功";
+			log.info(msg);
+		}else{
+			msg="confirmSingleForQueue 失败"+result.getErrorMessage();
+			log.info(msg);
+			return false;
+		}
+		
+		
+		result=new ResultData(http.getResourceByGet( UrlPrefix+"/otn/confirmPassenger/queryOrderWaitTime?random="+System.currentTimeMillis()+"&tourFlag=dc&_json_att=&REPEAT_SUBMIT_TOKEN="+globalRepeatSubmitToken));
+		//dataObj:{"queryOrderWaitTimeStatus":true,"count":-2,"waitTime":4,"requestId":6079125320457945429,"waitCount":2,"tourFlag":"dc","orderId":null}
+		String waitCount=result.getDataObj().getString("waitCount");
+		msg="排队成功！  当前等待人数: "+waitCount;
+		log.info(msg);
+		
+
+		MyOrdersDTO order = queryMyOrderNoComplete();
+		String orderInfo=order.getOrderInfo();
+		msg=orderInfo;
+		log.info("购票成功  订单信息:"+orderInfo);
+		
+		return true;
+	}
+	public Boolean buyTicketByCodition(String passagens,String seatypes,String trancodes){
+		return false;
+	}
+	JSONArray passengers=null;
+	public JSONArray queryPassengers() throws My12306Exception{
+		HashMap<String,String> params=new HashMap<String,String>();
+		params.put("pageIndex", "1");
+		params.put("pageSize", "10");
+		String content=http.getResourceByPost(params,UrlPrefix+"/otn/passengers/query","temp");
+		ResultData result=new ResultData(content);
+		//{"code":"7","passenger_name":"胡微微","sex_code":"M","sex_name":"男","born_date":"1900-01-01 00:00:00",
+		//"country_code":"CN","passenger_id_type_code":"1",
+		//"passenger_id_type_name":"二代身份证","passenger_id_no":"360730199103125914",
+		//"passenger_type":"1","passenger_flag":"0","passenger_type_name":"成人",
+		//"mobile_no":"","phone_no":"","email":"","address":"","postalcode":"",
+		//"first_letter":"HWW","recordCount":"8","isUserSelf":"N","total_times":"99"}
+		
+		 passengers=result.getDataObj().getJSONArray("datas");
+		 return passengers;
+
+	}
+	public void loginOut() throws My12306Exception{
+		String content=http.getResourceByGet(UrlPrefix+"/otn/login/loginOut");
+		log.debug(content);
+	}
+	
+	
+	public JSONObject findJsonFromHtml(String content,String pattern) {
+		String s=findStrFromHtml( content, pattern);
+		return s!=null?JSONObject.fromObject(s):null;
+	}
+	public String findStrFromHtml(String content,String pattern) {
+		/*String content=null;
+		try {
+			content = FileUtils.readFileToString(new File(path));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}*/
+		Pattern p=Pattern.compile(pattern,Pattern.MULTILINE);
+		Matcher m=p.matcher(content);
+		if(m.find()){
+			return m.group(1);
+		}
+		return null;
+	}
+	private JSONObject getPassagerByName(String name){
+		for(int i=0;i<passengers.size();i++){
+			if(passengers.getJSONObject(i).getString("passenger_name").equals(name)){
+				return passengers.getJSONObject(i);
+			}
+//			passengers.getJSONObject(i).getString("passenger_id_type_code");//证件id 身份证1
+//			passengers.getJSONObject(i).getString("passenger_id_no");//证件id 证件号
+//			passengers.getJSONObject(i).getString("isUserSelf");//是否 登陆用户自己 Y/N
+//			passengers.getJSONObject(i).getString("mobile_no");//手机号
+		}
+		return null;
+	}
+	
+	
+	public String getPassengerTicketStr(String[] passagersSetting,String seatType) throws My12306Exception{
+//		passengerTicketStr 座位编号,0,票类型(成人票1),乘客名,证件类型(身份证),证件号,手机号码,保存常用联系人(Y或N)
+//		passengerTicketStr:3,0,1,赖扬文,1,36070219921120063X,13049853872,N_3,0,1,胡微微,1,360730199103125914,,N
+		StringBuffer sb=new StringBuffer();
+		for(int i=0;i<passagersSetting.length;i++){
+			
+			JSONObject passager=getPassagerByName(passagersSetting[i]);
+			//seatTypes 
+			//无座0是我自己定义的 方便区分开
+			//"0:无座","1:硬座","3:硬卧","4:软卧","M:一等座","O:二等座","9:商务座","6:高级软卧","P:特等座"
+			
+			/*List<String> hasTiketSeatType=dto.getHasTiketSeatTypes(seatTypesSetting);
+			
+			String seatType=null;//硬座
+			if(hasTiketSeatType.size()>0){
+				seatType=hasTiketSeatType.get(0);
+			}
+			if(hasTiketSeatType.size()==0){
+				throw new My12306Exception(dto.getStation_train_code()+" 没你想要的票 : "+Arrays.toString(dto.convertSeatTypeCode2Name(seatTypesSetting)) );
+			}*/
+			
+			/*for(String type : seatTypesSetting){
+				if("1".equals(type) && !"--".equals(dto.getYz_num()) && !"无".equals(dto.getYz_num())){
+					validSeatType.add(type);
+				}else if("3".equals(type) && !"--".equals(dto.getYw_num())&& !"无".equals(dto.getYw_num())){
+					validSeatType.add(type);
+				}else if("4".equals(type) && !"--".equals(dto.getRw_num()) && !"无".equals(dto.getRw_num())){
+					validSeatType.add(type);
+				}else if("0".equals(type) && !"--".equals(dto.getWz_num()) && !"无".equals(dto.getWz_num())){
+					validSeatType.add("1");//无座的 其实传的座位类型  就是硬座
+				}else if("M".equals(type) && !"--".equals(dto.getZy_num()) && !"无".equals(dto.getZy_num())){
+					validSeatType.add(type);
+				}else if("O".equals(type) && !"--".equals(dto.getZe_num()) && !"无".equals(dto.getZe_num())){
+					validSeatType.add(type);
+				}else if("9".equals(type) && !"--".equals(dto.getSwz_num()) && !"无".equals(dto.getSwz_num())){
+					validSeatType.add(type);
+				}else if("6".equals(type) && !"--".equals(dto.getGr_num()) && !"无".equals(dto.getGr_num())){
+					validSeatType.add(type);
+				}else if("P".equals(type) && !"--".equals(dto.getTz_num()) && !"无".equals(dto.getTz_num())){
+					validSeatType.add(type);
+				}
+			}*/
+			if("0".equals(seatType)){
+				seatType="1";
+			}
+			String temp=seatType+",0,1,"+passager.getString("passenger_name")+","+passager.getString("passenger_id_type_code")+","+passager.getString("passenger_id_no")+","+passager.getString("mobile_no")+",N_";
+			sb.append(temp);
+//			passengers.getJSONObject(i).getString("passenger_name");
+//			passengers.getJSONObject(i).getString("passenger_id_type_code");//证件id 身份证1
+//			passengers.getJSONObject(i).getString("passenger_id_no");//证件id 证件号
+//			passengers.getJSONObject(i).getString("isUserSelf");//是否 登陆用户自己 Y/N
+//			passengers.getJSONObject(i).getString("mobile_no");//手机号
+		}
+		//return sb.substring(0,sb.length()-1);
+		return sb.toString();
+	}
+	public String getOldPassengerStr(String[] passagersSetting){
+//		乘客名,证件类型,证件号,乘客类型
+//		oldPassengerStr:赖扬文,1,36070219921120063X,1_胡微微,1,360730199103125914,1_
+		StringBuffer sb=new StringBuffer();
+		for(int i=0;i<passagersSetting.length;i++){
+			JSONObject passager=getPassagerByName(passagersSetting[i]);
+			String temp=passager.getString("passenger_name")+","+passager.getString("passenger_id_type_code")+","+passager.getString("passenger_id_no")+",1_";
+			sb.append(temp);
+		}
+		//return sb.substring(0,sb.length()-1);
+		return sb.toString();
+	}
+	//GET https://kyfw.12306.cn/otn/leftTicket/queryTicketPrice?train_no=65000K162008&from_station_no=01&to_station_no=08&seat_types=1431&train_date=2016-01-27 HTTP/1.1
+	//{"validateMessagesShowId":"_validatorMessage","status":true,"httpstatus":200,"data":{"3":"1290","A1":"¥72.0","1":"720","A4":"¥197.0","A3":"¥129.0","4":"1970","OT":[],"WZ":"¥72.0","train_no":"65000K162008"},"messages":[],"validateMessages":{}}
+	//软卧"A4":"¥197.0"    硬卧"A3":"¥129.0"    硬座"A1":"¥72.0"   无座"WZ":"¥72.0"
+	public TicketPriceDTO queryTicketPrice(String train_no,String from_station_no,String to_station_no,String seat_types,String train_date) throws My12306Exception{
+		String content=http.getResourceByGet(UrlPrefix+"/otn/leftTicket/queryTicketPrice?train_no="+train_no+"&from_station_no="+from_station_no+"&to_station_no="+to_station_no+"&seat_types="+seat_types+"&train_date="+train_date);
+		ResultData result=new ResultData(content);
+		if(result.isStatus()){
+			TicketPriceDTO dto=new TicketPriceDTO(result.getDataObj());
+			return dto;
+		}
+		log.error(result.getMessages());
+		return new TicketPriceDTO();
+		
+	}
+	public Boolean cancelNoCompleteMyOrder(String sequence_no) throws My12306Exception{
+		/*sequence_no:E852952385
+		cancel_flag:cancel_order
+		_json_att:*/
+		//{"validateMessagesShowId":"_validatorMessage","status":true,"httpstatus":200,"data":{"existError":"N"},"messages":[],"validateMessages":{}}
+		HashMap<String,String> params=new HashMap<String,String>();
+		params.put("sequence_no", sequence_no);
+		params.put("cancel_flag", "cancel_order");
+		String content=http.getResourceByPost(params,UrlPrefix+"/otn/queryOrder/cancelNoCompleteMyOrder");
+		ResultData result=new ResultData(content);
+		if(result.isStatus()){
+			if(result.getDataObj()!=null && result.getDataObj().getString("existError").equals("N")){
+				return true;
+			}
+		}
+		return false;
+		
+	}
+	//{"validateMessagesShowId":"_validatorMessage","status":true,"httpstatus":200,"data":{"orderDBList":[{"sequence_no":"E855155171","order_date":"2015-11-30 21:37:42","ticket_totalnum":1,"ticket_price_all":37200.0,"cancel_flag":"Y","resign_flag":"4","return_flag":"N","print_eticket_flag":"N","pay_flag":"Y","pay_resign_flag":"N","confirm_flag":"N","tickets":[{"stationTrainDTO":{"trainDTO":{},"station_train_code":"Z182","from_station_telecode":"BJQ","from_station_name":"深圳东","start_time":"1970-01-01 10:20:00","to_station_telecode":"GZG","to_station_name":"赣州","arrive_time":"1970-01-01 16:07:00","distance":"503"},"passengerDTO":{"passenger_name":"赖扬文","passenger_id_type_code":"1","passenger_id_type_name":"二代身份证","passenger_id_no":"36070219921120063X","total_times":"98"},"ticket_no":"E8551551711050151","sequence_no":"E855155171","batch_no":"1","train_date":"2015-12-01 00:00:00","coach_no":"05","coach_name":"05","seat_no":"0151","seat_name":"15号下铺","seat_flag":"0","seat_type_code":"6","seat_type_name":"高级软卧","ticket_type_code":"1","ticket_type_name":"成人票","reserve_time":"2015-11-30 21:37:42","limit_time":"2015-11-30 21:37:42","lose_time":"2015-11-30 22:07:43","pay_limit_time":"2015-11-30 22:07:43","ticket_price":37200.0,"print_eticket_flag":"N","resign_flag":"4","return_flag":"N","confirm_flag":"N","pay_mode_code":"Y","ticket_status_code":"i","ticket_status_name":"待支付","cancel_flag":"Y","amount_char":0,"trade_mode":"","start_train_date_page":"2015-12-01 10:20","str_ticket_price_page":"372.0","come_go_traveller_ticket_page":"N","return_deliver_flag":"N","deliver_fee_char":"","is_need_alert_flag":false,"is_deliver":"N","dynamicProp":"","fee_char":"","insure_query_no":""}],"reserve_flag_query":"p","if_show_resigning_info":"N","recordCount":"1","isNeedSendMailAndMsg":"N","array_passser_name_page":["赖扬文"],"from_station_name_page":["深圳东"],"to_station_name_page":["赣州"],"start_train_date_page":"2015-12-01 10:20","start_time_page":"10:20","arrive_time_page":"16:07","train_code_page":"Z182","ticket_total_price_page":"372.0","come_go_traveller_order_page":"N","canOffLinePay":"N","if_deliver":"N","insure_query_no":""}],"to_page":"db"},"messages":[],"validateMessages":{}}
+	public MyOrdersDTO queryMyOrderNoComplete() throws My12306Exception{
+		String content=http.getResourceByPost(null,UrlPrefix+"/otn/queryOrder/queryMyOrderNoComplete");
+		ResultData result=new ResultData(content);
+		
+		MyOrdersDTO dto=new MyOrdersDTO(result.getDataObj());
+		return dto;
+		
+		
+	} 
+	
+	public static void main(String[] args) throws Exception {
+		/*HttpService12306 s=new HttpService12306();
+		java.lang.reflect.Method m=s.getClass().getMethod("queryTicket",String.class,String.class,String.class);
+		System.out.println(m);*/
+		
+		//JSONUtils.convertToJavaIdentifier(key)
+		//JSONArray.fromObject(object)
+		
+		/*
+		HttpService12306 service=new HttpService12306();
+		String globalRepeatSubmitToken=service.findStrFromHtml("temp/init_text.html", "var globalRepeatSubmitToken\\s*=\\s*'(.*)';");
+		System.out.println(globalRepeatSubmitToken);*/
+		//service.buyTest(secretStr, train_date, back_train_date, tour_flag, purpose_codes, query_from_station_name, query_to_station_name)
+	}
+	
+}

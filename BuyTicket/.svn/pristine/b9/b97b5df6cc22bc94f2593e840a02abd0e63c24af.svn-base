@@ -1,0 +1,63 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>exe4j Wizard - Step 9: Compile Executable</title>
+<link href="../standalone/help_common.css" type="text/css" rel="stylesheet">
+<link href="../standalone/help.css" type="text/css" rel="stylesheet">
+<script type="text/javascript">
+helpId = 'exe4j.wizard.compile';
+indexUrl= '../index.html';
+</script><script src="../standalone/jquery.min.js" type="text/javascript"></script><script src="../standalone/tracking.js" type="text/javascript"></script>
+</head>
+<body>
+<div class="header-container">
+<div class="header-title">
+<h2>Exe4j Wizard - Step 9: Compile Executable</h2>
+</div>
+<div class="header-nav">
+<div class="nav-wrapper">
+<a title="key: j" href="../wizard/messages.html" class="nav-left"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: u" href="../wizard/$folder$.html" class="nav-up"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: k" href="../wizard/finish.html" class="nav-right"></a>
+</div>
+</div>
+</div>
+<hr>
+<div class="spacer"></div>
+<div>
+    
+<p>
+      In this step of the <a href="../wizard/wizard.html">exe4j wizard</a>, the
+      executable is compiled.
+    </p>
+    
+<p>
+      The progress bar indicates the status of the compilation process. Hitting
+      the <b>[Cancel]</b> button, stops the compilation process and moves 
+      back to the <a href="../wizard/messages.html">"configure messages" step</a>.
+      Should a compilation error occur, you will be notified with a message box and
+      the <a href="../wizard/finish.html">"Finished" step</a> will be displayed.
+    </p>
+  
+</div>
+<br>
+<hr>
+<div class="header-container">
+<div class="header-nav">
+<div class="nav-wrapper">
+<a title="key: j" href="../wizard/messages.html" class="nav-left"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: u" href="../wizard/$folder$.html" class="nav-up"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: k" href="../wizard/finish.html" class="nav-right"></a>
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>exe4j Licensing</title>
+<link href="standalone/help_common.css" type="text/css" rel="stylesheet">
+<link href="standalone/help.css" type="text/css" rel="stylesheet">
+<script type="text/javascript">
+helpId = 'exe4j.licensing';
+indexUrl= 'index.html';
+</script><script src="standalone/jquery.min.js" type="text/javascript"></script><script src="standalone/tracking.js" type="text/javascript"></script>
+</head>
+<body>
+<div class="header-container">
+<div class="header-title">
+<h2>Exe4j Licensing</h2>
+</div>
+<div class="header-nav">
+<div class="nav-wrapper">
+<a title="key: j" href="welcome.html" class="nav-left"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: k" href="wizard/wizard.html" class="nav-right"></a>
+</div>
+</div>
+</div>
+<hr>
+<div class="spacer"></div>
+<div>
+    
+<table style="margin-top: 1ex" cellpadding="3" cellspacing="0" border="0">
+<tr>
+<td valign="top"><img style="vertical-align: middle" border="0" src="images/help_section_bullet_16.png">&nbsp;</td><td>
+      
+        Without a valid license, exe4j may be used for evaluation purposes only.
+        The evaluation period is not time limited, but excludes any use for
+        creating distributions of commercial products.
+      
+      <p>
+        exe4j licenses can be
+        <a target="_blank" href="http://www.ej-technologies.com/redir.php?product=exe4j&target=order">purchased easily and securely online</a>.
+        We accept a large variety of payment methods including credit cards, checks and purchase orders.
+        Pricing information
+        is available <a target="_blank" href="http://www.ej-technologies.com/redir.php?product=exe4j&target=prices">online</a>.
+      </p>
+    
+</td>
+</tr>
+</table>
+    
+<table style="margin-top: 1ex" cellpadding="3" cellspacing="0" border="0">
+<tr>
+<td valign="top"><img style="vertical-align: middle" border="0" src="images/help_section_bullet_16.png">&nbsp;</td><td>
+      
+        You can enter your license key in the <a href="wizard/welcome.html">welcome step</a> of the exe4j wizard.
+        If a license has been entered, the licensing information is visible there. The exe4j
+        <a href="cli/cli.html">command line compiler</a> also prints licensing information except when invoked with the
+        <a href="cli/options.html">quiet option</a>.
+      
+      <p>
+        Please read the included file <tt>license.txt</tt> to learn more about
+        the scope of the license. For licensing questions, please contact
+        <a target="_blank" href="http://www.ej-technologies.com/redir.php?product=install4j&target=sales&type=sales">sales@ej-technologies.com</a>.
+      </p>
+    
+</td>
+</tr>
+</table>
+    
+<table style="margin-top: 1ex" cellpadding="3" cellspacing="0" border="0">
+<tr>
+<td valign="top"><img style="vertical-align: middle" border="0" src="images/help_section_bullet_16.png">&nbsp;</td><td><b>License key dialog:</b>
+      
+<p>
+        Together with your license key, you are asked for your name and - if applicable -
+        for the name of your company. 
+      </p>
+      
+<p>
+        To make it easier for you to enter the license key, you can use the
+        <b>[Paste from clipboard]</b> button, after copying any text fragment which 
+        contains the license key to your system clipboard. If a valid license key can be found
+        in the clipboard content, it is extracted and displayed in the dialog.
+      </p>
+    
+</td>
+</tr>
+</table>
+  
+</div>
+<br>
+<hr>
+<div class="header-container">
+<div class="header-nav">
+<div class="nav-wrapper">
+<a title="key: j" href="welcome.html" class="nav-left"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: k" href="wizard/wizard.html" class="nav-right"></a>
+</div>
+</div>
+</div>
+</body>
+</html>

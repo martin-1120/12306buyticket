@@ -1,0 +1,108 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Controlling the splash screen from your application</title>
+<link href="../standalone/help_common.css" type="text/css" rel="stylesheet">
+<link href="../standalone/help.css" type="text/css" rel="stylesheet">
+<script type="text/javascript">
+helpId = 'exe4j.api.splash';
+indexUrl= '../index.html';
+</script><script src="../standalone/jquery.min.js" type="text/javascript"></script><script src="../standalone/tracking.js" type="text/javascript"></script>
+</head>
+<body>
+<div class="header-container">
+<div class="header-title">
+<h2>Controlling The Splash Screen From Your Application</h2>
+</div>
+<div class="header-nav">
+<div class="nav-wrapper">
+<a title="key: j" href="../wizard/dialogs/visual.html" class="nav-left"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: u" href="../splash/$folder$.html" class="nav-up"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: k" href="../splash/singleInstance.html" class="nav-right"></a>
+</div>
+</div>
+</div>
+<hr>
+<div class="spacer"></div>
+<div>
+    
+<table style="margin-top: 1ex" cellpadding="3" cellspacing="0" border="0">
+<tr>
+<td valign="top"><img style="vertical-align: middle" border="0" src="../images/help_section_bullet_16.png">&nbsp;</td><td>
+      
+        If you have enabled a <a href="../wizard/splashScreen.html">splash screen</a>
+        for your exe4j executable, you usually want to hide it once the application
+        startup is finished. With exe4j's
+        <a href="../wizard/splashScreen.html">auto-off mode</a> enabled, the
+        splash will be hidden automatically as soon as your application opens the 
+        first window.
+      
+      <p>
+        However, you might want to hide the splash screen programmatically or update the 
+        contents of the status text line on the splash screen during the startup
+        phase to provide more extensive feedback to your users.
+      </p>
+    
+</td>
+</tr>
+</table>
+    
+<table style="margin-top: 1ex" cellpadding="3" cellspacing="0" border="0">
+<tr>
+<td valign="top"><img style="vertical-align: middle" border="0" src="../images/help_section_bullet_16.png">&nbsp;</td><td>
+      With the <a target="_blank" href="../javadoc/com/exe4j/Controller.html">exe4j launcher API</a> you can
+      <ul>
+<li>
+<span class="sectiontitle">Hide the splash screen programatically</span>
+<br>
+          Invoke the static method <tt>com.exe4j.Controller.hide()</tt>
+          as soon as you wish to hide the splash screen.
+        </li>
+<li>
+<span class="sectiontitle">Update the status text line</span>
+<br>
+          Invoke the static method 
+          <tt>com.exe4j.Controller.writeMessage(String message)</tt>
+          to change the text in the status line.
+        </li>
+</ul>
+      
+<p>
+        The launcher API of exe4j is
+        contained in <tt>exe4jlib.jar</tt> which can be found in the top level directory
+        of your exe4j installation.
+      </p>
+      
+<p>
+        
+<b>Note:</b> you do <b>not</b> have to add it to the
+        classpath of your application and distribute it along with it, since that file
+        is always contained in the executable.
+      </p>
+    
+</td>
+</tr>
+</table>
+  
+</div>
+<br>
+<hr>
+<div class="header-container">
+<div class="header-nav">
+<div class="nav-wrapper">
+<a title="key: j" href="../wizard/dialogs/visual.html" class="nav-left"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: u" href="../splash/$folder$.html" class="nav-up"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: k" href="../splash/singleInstance.html" class="nav-right"></a>
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<jnlp spec="1.0+" codebase="http://192.168.1.101:8080" href="buyticket.jnlp">
+	<information>
+		<title>12306 BuyTicket 1.0 </title>
+		<vendor>xxx</vendor>
+		<description>description xxxxxx </description>
+   </information>
+
+     <resources>
+		<j2se version="1.6+"/>
+		<jar href="http://192.168.1.101:8080/buy.jar"/>
+		<property name="file.encoding" value="utf-8"/>
+	</resources>
+
+	<resources os="Windows">
+		<j2se version="1.6+" java-vm-args="-XX:MaxPermSize=128M"/>
+	</resources>
+
+	<application-desc main-class="com.buyticket.ui.MainFrm"/>
+
+	<security>
+		<all-permissions/>
+	</security>
+</jnlp>

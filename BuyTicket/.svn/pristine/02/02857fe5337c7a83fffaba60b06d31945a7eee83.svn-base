@@ -1,0 +1,131 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>exe4j Wizard - Text Lines On Splash Screen</title>
+<link href="../standalone/help_common.css" type="text/css" rel="stylesheet">
+<link href="../standalone/help.css" type="text/css" rel="stylesheet">
+<script type="text/javascript">
+helpId = 'exe4j.wizard.splashScreenOptions';
+indexUrl= '../index.html';
+</script><script src="../standalone/jquery.min.js" type="text/javascript"></script><script src="../standalone/tracking.js" type="text/javascript"></script>
+</head>
+<body>
+<div class="header-container">
+<div class="header-title">
+<h2>Exe4j Wizard - Text Lines On Splash Screen</h2>
+</div>
+<div class="header-nav">
+<div class="nav-wrapper">
+<a title="key: j" href="../wizard/vmType.html" class="nav-left"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: u" href="../wizard/$advancedFolder$.html" class="nav-up"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: k" href="../wizard/dialogs/mainClass.html" class="nav-right"></a>
+</div>
+</div>
+</div>
+<hr>
+<div class="spacer"></div>
+<div>
+    
+<p>
+      
+<b>Note:</b> this advanced option screen is reachable by selecting the
+      <a href="../wizard/splashScreen.html">"Splash screen" step</a> and choosing
+      "Text lines" from the <b>[Advanced options]</b>
+      popup menu or by clicking directly on the index.
+    </p>
+    
+<table style="margin-top: 1ex" cellpadding="3" cellspacing="0" border="0">
+<tr>
+<td valign="top"><img style="vertical-align: middle" border="0" src="../images/help_section_bullet_16.png">&nbsp;</td><td>
+      
+        If you would like to overlay lines of text for status and version information on the splash screen,
+        you can select the check box at the top.
+      
+      <p>
+        The <tt>Status line</tt> and <tt>Version line</tt> sections allow you
+        to position the text lines on the splash screen and configure their font.
+        The status line is dynamically updatable with
+        <a href="../splash/splash.html">exe4j's launcher API</a>. If you include the variable
+        <tt>%VERSION%</tt> in the version line text, it will be replaced with the
+        product version defined in the <a href="../wizard/versionInfo.html">version info step</a>
+        of the wizard. With the <tt>-r</tt> flag, you can override this setting for the
+        <a href="../cli/options.html">command line compiler</a>.
+      </p>
+      
+<p>
+        You can configure the following properties of a text line
+      </p>
+      
+<ul>
+<li>
+<span class="sectiontitle">Text</span>
+<br>
+          The (initial) text displayed in the text line.
+        </li>
+<li>
+<span class="sectiontitle">Position</span>
+<br>
+          The x and y-coordinates of the text line on the splash screen. The origin of 
+          the coordinate system is the top left corner of the splash screen window.
+        </li>
+<li>
+<span class="sectiontitle">Font</span>
+<br>
+          The font used for drawing the text line:
+          <ul>
+<li>
+<span class="sectiontitle">Size</span>
+<br>
+              The size of the font in points.
+            </li>
+<li>
+<span class="sectiontitle">Bold</span>
+<br>
+              Whether the font weight should be bold or not.
+            </li>
+<li>
+<span class="sectiontitle">Color</span>
+<br>
+              The color of the font. By clicking on <b>[...]</b>, a color chooser
+              dialog is brought up.
+            </li>
+</ul>
+        
+</li>
+</ul>
+      
+<p>
+        To <b>visually position the text lines</b> with mouse and keyboard
+        on the actual splash screen image,  please click on the
+        <b>[Position text lines visually]</b> button. The
+        <a href="../wizard/dialogs/visual.html">visual positioning dialog</a> will
+        then be displayed. On exiting the dialog with the <b>[OK]</b> button,
+        the X/Y coordinate text fields (see above) will be updated for both text lines.
+      </p>
+    
+</td>
+</tr>
+</table>
+  
+</div>
+<br>
+<hr>
+<div class="header-container">
+<div class="header-nav">
+<div class="nav-wrapper">
+<a title="key: j" href="../wizard/vmType.html" class="nav-left"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: u" href="../wizard/$advancedFolder$.html" class="nav-up"></a>
+</div>
+<div class="nav-wrapper">
+<a title="key: k" href="../wizard/dialogs/mainClass.html" class="nav-right"></a>
+</div>
+</div>
+</div>
+</body>
+</html>

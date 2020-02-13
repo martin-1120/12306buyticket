@@ -1,0 +1,18 @@
+硬座座位没有了，应该能自动换
+
+
+IE把证书复制下来导入keystore中
+keytool -import -noprompt -keystore "C:\Program Files (x86)\Java\jdk1.8.0_05\jre\lib\security\cacerts" -storepass changeit -alias 12306 -file 12306.cer
+
+keytool -delete -keystore "C:\Program Files (x86)\Java\jdk1.8.0_05\jre\lib\security\cacerts" -storepass changeit -alias 12306
+
+keytool -list -keystore "C:\Program Files (x86)\Java\jdk1.8.0_05\jre\lib\security\cacerts"  -storepass changeit | findstr -i 12306
+
+命令行js引擎报错  因为js文件有中文 加上编码才不会报错
+java -Dfile.encoding=utf-8 -jar project.jar
+
+
+-Djava.ext.dirs
+有了这个，就不用一个一个的写了。
+如：java -Djava.ext.dirs=lib MainClass 
+这样就可以达到简化设置classpath了
